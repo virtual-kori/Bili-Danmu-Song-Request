@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>点歌机 · OBS 歌词</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --cur: #ffffff;
+        --other: #8ea0b8;
+        --size-cur: 11vh;
+        --size-other: 4.5vh;
+        --glow: none;
+        /* 描边/阴影，保证在任何背景上都能看清 */
+        --shadow: 0 0.25vh 1.2vh rgba(0, 0, 0, 0.85), 0 0 3vh rgba(0, 0, 0, 0.6);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+      body {
+        font-family: "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+        display: flex; padding: 3vh 4vw;
+        /* 上下对齐：由 JS 按 ?valign 覆盖 */
+        align-items: center;
+        /* 左右对齐：由 JS 按 ?halign 覆盖 */
+        justify-content: center;
+      }
+      .stage { width: 100%; display: flex; flex-direction: column; gap: 1.2vh; }
+      .line {
+        line-height: 1.32; max-width: 100%;
+        word-break: break-word; white-space: pre-wrap;
+        /* 左右对齐：由 JS 按 ?halign 覆盖 */
+        text-align: center;
+        transition: color 0.2s, font-size 0.2s, opacity 0.2s;
+      }
+      .line.other { font-size: var(--size-other); color: var(--other); opacity: 0.62; text-shadow: var(--shadow); }
+      .line.cur {
+        font-size: var(--size-cur); font-weight: 700; color: var(--cur);
+        text-shadow: var(--shadow), var(--glow);
+      }
+      /* 滚动模式：上下各显示若干行，当前行最大 */
+      .stage.scroll { gap: 0.5vh; }
+      /* 允许用 ?debug=1 打开一条参考底线，方便在 OBS 里对齐 */
+      body.debug::after {
+        content: ''; position: fixed; left: 4vw; right: 4vw; bottom: 3vh;
+        height: 1px; background: rgba(255, 80, 80, 0.55);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage" id="stage">
+      <div class="line other" id="l2"></div>
+      <div class="line other" id="l1"></div>
+      <div class="line cur" id="cur">等待播放…</div>
+      <div class="line other" id="n1"></div>
+      <div class="line other" id="n2"></div>
+    </div>
+    <script>
+      (function () {
+        var q = new URLSearchParams(location.search);
+        var num = function (name, fallback) {
+          var v = parseFloat(q.get(name));
+          return isFinite(v) && v > 0 ? v : fallback;
+        };
+        var color = function (name, fallback) {
+          var v = (q.get(name) || '').trim();
+          return /^#?[0-9a-fA-F]{6}$/.test(v) ? (v[0] === '#' ? v : '#' + v) : fallback;
+        };
+        var flag = function (name, fallback) {
+          var v = q.get(name);
+          if (v === null || v === '') return fallback;
+          return v === '1' || v === 'true';
+        };
+
+        /* 样式全部来自 URL，方便一场景一参数 */
+        var root = document.documentElement.style;
+        var curColor = color('cur', '#ffffff');
+        root.setProperty('--cur', curColor);
+        root.setProperty('--other', color('other', '#8ea0b8'));
+        // 字号单位 vh：跟着浏览器源的高度缩放。默认值特意给得比较大，
+        // 因为常见浏览器源高度在 300~800px 之间，太小在直播画面里根本看不清。
+        root.setProperty('--size-cur', num('sizeCur', 11) + 'vh');
+        root.setProperty('--size-other', num('sizeOther', 4.5) + 'vh');
+        if (flag('glow', false)) root.setProperty('--glow', '0 0 4vh ' + rgba(curColor, 0.7));
+
+        // 显示模式：single 单行 / two 两行 / three 三行 / scroll 滚动
+        var mode = (q.get('mode') || 'two').toLowerCase();
+        if (['single', 'two', 'three', 'scroll'].indexOf(mode) < 0) mode = 'two';
+
+        // 左右对齐 / 上下对齐
+        var halign = (q.get('halign') || q.get('align') || 'center').toLowerCase();
+        if (['left', 'center', 'right'].indexOf(halign) < 0) halign = 'center';
+        var valign = (q.get('valign') || 'bottom').toLowerCase();
+        if (['top', 'middle', 'bottom'].indexOf(valign) < 0) valign = 'bottom';
+
+        document.body.style.justifyContent =
+          halign === 'left' ? 'flex-start' : halign === 'right' ? 'flex-end' : 'center';
+        document.body.style.alignItems =
+          valign === 'top' ? 'flex-start' : valign === 'middle' ? 'center' : 'flex-end';
+        Array.prototype.forEach.call(document.querySelectorAll('.line'), function (el) {
+          el.style.textAlign = halign;
+        });
+        document.getElementById('stage').classList.toggle('scroll', mode === 'scroll');
+
+        if (flag('debug', false)) document.body.classList.add('debug');
+
+        // 自定义 CSS：由设置面板写进 URL 的 css 参数，原样注入。
+        // 放在默认样式之后，所以能覆盖任何默认外观（OBS 读不到本地文件，只能这样传）。
+        var customCss = q.get('css') || '';
+        if (customCss.trim()) {
+          var st = document.createElement('style');
+          st.id = 'user-css';
+          st.textContent = customCss;
+          document.head.appendChild(st);
+        }
+        // showMeta=1 时把「作词/作曲」这类制作信息也当成歌词显示（默认跳过，
+        // 否则歌曲开头几十秒一直显示制作信息，看上去像「歌词没出来」）
+        var showMeta = flag('showMeta', false);
+        // waiting=1 时没有歌词可显示就留空（默认显示「等待播放」等提示）
+        var hideTips = flag('waiting', false);
+        // 滚动模式下当前行上下各显示 2 行（页面里正好有 5 个槽位）
+        var SCROLL_SPAN = 2;
+
+        function rgba(hex, a) {
+          var m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+          if (!m) return 'rgba(255,255,255,' + a + ')';
+          var n = parseInt(m[1], 16);
+          return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+        }
+
+        var state = null;
+        var lyric = { songKey: '', lines: [], loading: false };
+        var songKey = '';
+        var tries = 0;
+        var nextAt = 0;
+        var stageEl = document.getElementById('stage');
+        var curEl = document.getElementById('cur');
+        var lineEls = {
+          l2: document.getElementById('l2'),
+          l1: document.getElementById('l1'),
+          n1: document.getElementById('n1'),
+          n2: document.getElementById('n2'),
+        };
+
+        function timeText(sec) {
+          sec = Math.max(0, Math.floor(Number(sec) || 0));
+          return String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
+        }
+        /* 有些 OBS 场景希望除了歌词再带一行歌名，用 ?song=1 打开 */
+        var showSong = flag('song', false);
+
+        function clearOthers() {
+          Object.keys(lineEls).forEach(function (k) {
+            lineEls[k].textContent = '';
+          });
+        }
+
+        function paint() {
+          var cur = state && state.current;
+          if (!cur) {
+            curEl.textContent = hideTips ? '' : '等待播放…';
+            clearOthers();
+            return;
+          }
+          if (lyric.loading) {
+            curEl.textContent = hideTips ? '' : '正在获取歌词…';
+            clearOthers();
+            return;
+          }
+          // 默认把「作词/作曲/编曲」这类制作信息剔掉，只留真正要唱的歌词
+          var lines = (lyric.lines || []).filter(function (l) {
+            return showMeta || !l.meta;
+          });
+          if (!lines.length) {
+            curEl.textContent = showSong ? cur.name + ' - ' + (cur.singer || '') : hideTips ? '' : '这首歌没有歌词';
+            clearOthers();
+            return;
+          }
+          var pos = Number(cur.position) || 0;
+          var idx = -1;
+          for (var i = 0; i < lines.length; i++) {
+            if (lines[i].t <= pos) idx = i;
+            else break;
+          }
+          // 还没唱到第一句时先把第一句显示出来（否则歌一开始是空白的，很像坏了）
+          if (idx < 0) idx = 0;
+
+          var tail = showSong ? cur.name + ' - ' + (cur.singer || '') + '  ' + timeText(cur.duration) : '';
+
+          if (mode === 'single') {
+            // 单行：只显示当前句
+            curEl.textContent = lines[idx].text;
+            clearOthers();
+            return;
+          }
+
+          if (mode === 'scroll') {
+            // 滚动：当前句 + 上下各 2 句，越远越淡（正好用满 5 个槽位）
+            clearOthers();
+            curEl.textContent = lines[idx].text;
+            var slots = [
+              [-2, lineEls.l2],
+              [-1, lineEls.l1],
+              [1, lineEls.n1],
+              [2, lineEls.n2],
+            ];
+            slots.forEach(function (pair) {
+              var off = pair[0];
+              var el = pair[1];
+              if (!el) return;
+              var j = idx + off;
+              el.textContent = j >= 0 && j < lines.length ? lines[j].text : '';
+              el.style.opacity = off === -2 || off === 2 ? '0.3' : '0.55';
+            });
+            return;
+          }
+
+          // two / three：当前句 + 一句或两句上下文
+          curEl.textContent = lines[idx].text;
+          clearOthers();
+          if (idx > 0) lineEls.l1.textContent = lines[idx - 1].text;
+          var nx = idx + 1 < lines.length ? lines[idx + 1].text : tail;
+          lineEls.n1.textContent = nx;
+          if (mode === 'three') {
+            if (idx > 1) lineEls.l2.textContent = lines[idx - 2].text;
+            if (idx + 2 < lines.length) lineEls.n2.textContent = lines[idx + 2].text;
+          }
+        }
+
+        function fetchLyric(want) {
+          fetch('/api/lyric')
+            .then(function (r) { return r.json(); })
+            .then(function (r) {
+              if (!r || !r.ok || !r.data) return;
+              if (want !== songKey || r.data.songKey !== want) return;
+              lyric = { songKey: r.data.songKey, lines: r.data.lines || [], loading: Boolean(r.data.loading) };
+              paint();
+            })
+            .catch(function () {});
+        }
+
+        function onState(s) {
+          state = s;
+          var cur = s.current;
+          var key = cur ? cur.platform + '::' + (cur.songId || '') + '::' + (cur.name || '') : '';
+          if (key !== songKey) {
+            songKey = key;
+            tries = 0;
+            nextAt = Date.now() + 1200;
+            lyric = cur ? { songKey: key, lines: [], loading: true } : { songKey: '', lines: [], loading: false };
+            paint();
+            if (cur) fetchLyric(key);
+            return;
+          }
+          // 歌词还没回来就追问（引擎是异步取歌词的）
+          if (lyric.loading && tries < 10 && Date.now() >= nextAt) {
+            tries += 1;
+            nextAt = Date.now() + 1200;
+            fetchLyric(key);
+          }
+          paint();
+        }
+
+        function connect() {
+          var proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
+          var ws = new WebSocket(proto + location.host + '/ws');
+          ws.onmessage = function (ev) {
+            try {
+              var m = JSON.parse(ev.data);
+              if (m.type === 'state') onState(m.data);
+            } catch (e) {}
+          };
+          ws.onclose = function () { setTimeout(connect, 1500); };
+          ws.onerror = function () {};
+        }
+
+        fetch('/api/state')
+          .then(function (r) { return r.json(); })
+          .then(function (r) { if (r && r.ok) onState(r.data); })
+          .catch(function () {});
+        connect();
+      })();
+    </script>
+  </body>
+</html>

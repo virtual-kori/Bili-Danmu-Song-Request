@@ -1,0 +1,4006 @@
+# KuGouMusic API
+
+酷狗音乐 NodeJS 版 API
+
+[![](https://img.shields.io/badge/Author-MakcRe-blueviolet?style=for-the-badge '作者')](https://github.com/MakcRe)
+![](https://img.shields.io/badge/dynamic/json?label=GitHub%20Followers&style=for-the-badge&query=%24.data.totalSubs&url=https%3A%2F%2Fapi.spencerwoo.com%2Fsubstats%2F%3Fsource%3Dgithub%26queryKey%3DMakcRe&labelColor=282c34&color=181717&logo=github&longCache=true '关注数量')
+![](https://img.shields.io/github/stars/MakcRe/KuGouMusicApi.svg?style=for-the-badge&label=Star 'Star数量')
+![](https://img.shields.io/github/forks/MakcRe/KuGouMusicApi.svg?style=for-the-badge&label=Fork 'Fork数量')
+![](https://img.shields.io/github/issues/MakcRe/KuGouMusicApi.svg?style=for-the-badge&label=Issues 'Issues数量')
+![](https://img.shields.io/github/contributors/MakcRe/KuGouMusicApi?style=for-the-badge '贡献者')
+![](https://img.shields.io/github/repo-size/MakcRe/KuGouMusicApi?style=for-the-badge&label=files&color=cf8ef4&labelColor=373e4dl '文件大小')
+![](https://img.shields.io/github/languages/code-size/MakcRe/KuGouMusicApi?color=blueviolet&style=for-the-badge '代码大小')
+
+[//]: # '<br>'
+
+![](https://img.shields.io/github/package-json/v/MakcRe/KuGouMusicApi?longCache=true&style=for-the-badge)
+![](https://img.shields.io/badge/Node-12+-green.svg?longCache=true&style=for-the-badge)
+![](https://img.shields.io/badge/License-mit-blue.svg?longCache=true&style=for-the-badge)
+
+## 环境要求
+
+需要 NodeJS 12+ 环境
+
+## 工作原理
+
+跨站请求伪造 (CSRF), 伪造请求头 , 调用官方 API
+
+## 功能特性
+
+1. [`登录`](#登录)
+2. [`刷新登录`](#刷新登录)
+3. [`发送验证码`](#发送验证码)
+4. [`dfid 获取`](#dfid-获取)
+5. [`获取用户额外信息`](#获取用户额外信息)
+6. [`获取用户 Auth`](#获取用户-auth)
+7. [`获取用户 vip 信息`](#获取用户-vip-信息)
+8. [`获取用户歌单`](#获取用户歌单)
+9. [`获取用户云盘`](#获取用户云盘)
+10. [`获取用户云盘音乐 URL`](#获取用户云盘音乐-url)
+11. [`获取用户收藏的视频`](#获取用户收藏的视频)
+12. [`获取用户喜欢的视频`](#获取用户喜欢的视频)
+13. [`获取用户关注列表`](#获取用户关注列表)
+14. [`获取用户好友列表`](#获取用户好友列表)
+15. [`获取用户粉丝列表`](#获取用户粉丝列表)
+16. [`获取访客列表`](#获取访客列表)
+17. [`获取用户听歌历史排行`](#获取用户听歌历史排行)
+18. [`获取用户最近听歌历史`](#获取用户最近听歌历史)
+19. [`获取继续播放信息（对应手机版首页显示继续播放入口）`](#获取继续播放信息（对应手机版首页显示继续播放入口）)
+20. [`收藏歌单/新建歌单`](#收藏歌单新建歌单)
+21. [`取消收藏歌单/删除歌单`](#取消收藏歌单删除歌单)
+22. [`对歌单添加歌曲`](#对歌单添加歌曲)
+23. [`对歌单删除歌曲`](#对歌单删除歌曲)
+24. [`新碟上架`](#新碟上架)
+25. [`专辑信息`](#专辑信息)
+26. [`专辑详情`](#专辑详情)
+27. [`专辑音乐列表`](#专辑音乐列表)
+28. [`专辑动态封面`](#专辑动态封面)
+29. [`获取音乐 Auth`](#获取音乐-auth)
+30. [`获取音乐 URL`](#获取音乐)
+31. [`获取音乐 URL（新版）`](#获取音乐-url新版)
+32. [`获取音乐 URL （Auth 版本）`](#获取音乐-url-auth-版本)
+33. [`获取音乐 URL （Auth 聚合版本）`](#获取音乐-url-auth-聚合版本)
+34. [`获取歌曲高潮部分`](#获取歌曲高潮部分)
+35. [`搜索`](#搜索)
+36. [`默认搜索关键词`](#默认搜索关键词)
+37. [`综合搜索`](#综合搜索)
+38. [`热搜列表`](#热搜列表)
+39. [`搜索建议`](#搜索建议)
+40. [`歌词搜索`](#歌词搜索)
+41. [`获取歌词`](#获取歌词)
+42. [`歌单分类`](#歌单分类)
+43. [`歌单`](#歌单)
+44. [`主题歌单`](#主题歌单)
+45. [`音效歌单`](#音效歌单)
+46. [`获取歌单详情`](#获取歌单详情)
+47. [`获取歌单所有歌曲`](#获取歌单所有歌曲)
+48. [`获取歌单所有歌曲（新版）`](#获取歌单所有歌曲新版)
+49. [`相似歌单`](#相似歌单)
+50. [`获取主题歌单所有歌曲`](#获取主题歌单所有歌曲)
+51. [`获取主题音乐`](#获取主题音乐)
+52. [`获取主题音乐详情`](#获取主题音乐详情)
+53. [`歌曲推荐`](#歌曲推荐)
+54. [`获取歌手和专辑图片`](#获取歌手和专辑图片)
+55. [`获取歌手图片`](#获取歌手图片)
+56. [`获取音乐相关信息`](#获取音乐相关信息)
+57. [`获取更多音乐版本`](#获取更多音乐版本)
+58. [`获取音乐伴奏信息`](#获取音乐伴奏信息)
+59. [`获取音乐k歌数量`](#获取音乐-k-歌数量)
+60. [`获取音乐详情`](#获取音乐详情)
+61. [`获取音乐专辑/歌手信息`](#获取音乐专辑/歌手信息)
+62. [`私人 FM(对应手机和 pc 端的猜你喜欢)`](#私人-fm对应手机和-pc-端的猜你喜欢)
+63. [`banner`](#banner)
+64. [`乐库 banner`](#乐库-banner)
+65. [`乐库电台`](#乐库电台)
+66. [`乐库`](#乐库)
+67. [`电台 - 推荐`](#电台-推荐)
+68. [`电台`](#电台)
+69. [`电台 - 图片`](#电台-图片)
+70. [`电台 - 音乐列表`](#电台-音乐列表)
+71. [`编辑精选`](#编辑精选)
+72. [`编辑精选数据`](#编辑精选数据)
+73. [`编辑精选歌单`](#编辑精选歌单)
+74. [`编辑精选专区`](#编辑精选专区)
+75. [`编辑精选专区详情`](#编辑精选专区详情)
+76. [`领取 VIP（需要登陆，该接口为测试接口，仅限概念版使用）`](#领取-vip需要登陆该接口为测试接口仅限概念版使用)
+77. [`领取一天 VIP（需要登陆，该接口为测试接口，仅限概念版使用）`](#领取一天-vip需要登陆该接口为测试接口仅限概念版使用)
+78. [`获取当月已领取 VIP 天数（需要登陆，该接口为测试接口，仅限概念版使用）`](#获取当月已领取-vip-天数需要登陆该接口为测试接口仅限概念版使用)
+79. [`获取已领取 VIP 状态（需要登陆，该接口为测试接口，仅限概念版使用）`](#获取已领取-vip-状态需要登陆该接口为测试接口仅限概念版使用)
+80. [`获取歌手列表`](#获取歌手列表)
+81. [`获取歌手详情`](#获取歌手详情)
+82. [`获取歌手专辑`](#获取歌手专辑)
+83. [`获取歌手单曲`](#获取歌手单曲)
+84. [`获取歌手 MV`](#获取歌手-MV)
+85. [`关注歌手`](#关注歌手)
+86. [`取消关注歌手`](#取消关注歌手)
+87. [`获取关注歌手新歌`](#获取关注歌手新歌)
+88. [`获取视频 url`](#获取视频-ur)
+89. [`获取歌曲 MV`](#获取歌曲-MV)
+90. [`获取视频相关信息`](#获取视频相关信息)
+91. [`获取视频详情`](#获取视频详情)
+92. [`新歌速递`](#新歌速递)
+93. [`场景音乐列表`](#场景音乐列表)
+94. [`场景音乐详情`](#场景音乐详情)
+95. [`获取场景音乐讨论区`](#获取场景音乐讨论区)
+96. [`获取场景音乐模块 Tag`](#获取场景音乐模块)
+97. [`获取场景音乐歌单列表`](#获取场景音乐歌单列表)
+98. [`获取场景音乐视频列表`](#获取场景音乐视频列表)
+99. [`获取场景音乐音乐列表`](#获取场景音乐音乐列表)
+100. [`每日推荐`](#每日推荐)
+101. [`历史推荐`](#历史推荐)
+102. [`风格推荐`](#风格推荐)
+103. [`排行列表`](#排行列表)
+104. [`排行榜推荐列表`](#排行榜推荐列表)
+105. [`排行榜往期列表`](#排行榜往期列表)
+106. [`排行榜信息`](#排行榜信息)
+107. [`排行榜歌曲列表`](#排行榜歌曲列表)
+108. [`歌曲收藏数`](#歌曲收藏数)
+109. [`歌曲评论数`](#歌曲评论数)
+110. [`歌曲评论`](#歌曲评论)
+111. [`歌曲评论-根据分类返回`](#歌曲评论-根据分类返回)
+112. [`歌曲评论-根据热词返回`](#歌曲评论-根据热词返回)
+113. [`楼层评论`](#楼层评论)
+114. [`歌单评论`](#歌单评论)
+115. [`专辑评论`](#专辑评论)
+116. [`提交听歌历史`](#提交听歌历史)
+117. [`获取服务器时间`](#获取服务器时间)
+118. [`刷刷`](#刷刷)
+119. [`AI 推荐`](#ai-推荐)
+120. [`曲谱 - 获取歌曲曲谱`](#曲谱---获取歌曲曲谱)
+121. [`曲谱 - 曲谱排行榜`](#曲谱---曲谱排行榜)
+122. [`曲谱 - 曲谱详情`](#曲谱---曲谱详情)
+123. [`曲谱 - 曲谱广场`](#曲谱---曲谱广场)
+124. [`曲谱 - 曲谱标签`](#曲谱---曲谱标签)
+125. [`频道 - 获取用户所有频道`](#频道-获取用户所有频道)
+126. [`频道 - 详情`](#频道---详情)
+127. [`频道 - 频道安利`](#频道-频道安利)
+128. [`频道 - 相似频道`](#频道-相似频道)
+129. [`频道 - 订阅`](#频道-订阅)
+130. [`频道 - 音乐故事`](#频道-音乐故事)
+131. [`频道 - 音乐故事详情`](#频道-音乐故事详情)
+132. [`动态 - 最常访问`](#动态-最常访问)
+133. [`获取用户公开的音乐`](#获取用户公开的音乐)
+134. [`听书 - 每日推荐`](#听书-每日推荐)
+135. [`听书 - 排行榜推荐`](#听书-排行榜推荐)
+136. [`听书 - VIP 推荐`](#听书-vip-推荐)
+137. [`听书 - 每周推荐`](#听书-每周推荐)
+138. [`听书 - 专辑详情`](#听书-专辑详情)
+139. [`听书 - 专辑音乐列表`](#听书-专辑音乐列表)
+140. [`歌曲详情 - 歌曲成绩单`](#歌曲详情-歌曲成绩单)
+141. [`歌曲详情 - 歌曲成绩单详情`](#歌曲详情---歌曲成绩单详情)
+142. [`听歌识曲`](#听歌识曲)
+143. [`获取已购单曲`](#获取已购单曲)
+144. [`获取已购专辑`](#获取已购专辑)
+145. [`上传音乐到云盘`](#上传音乐到云盘)
+146. [`获取听歌等级信息`](#获取听歌等级信息) / [`上报听歌时长`](#上报听歌时长)
+147. [`编辑内容黑名单`](#编辑内容黑名单)
+148. [`获取内容黑名单`](#获取内容黑名单)
+149. [`导入外部歌单`](#导入外部歌单)
+150. [`获取歌手单曲（新版）`](#获取歌手单曲新版)
+151. [`组队领取VIP - 获取本期活动信息（需要登陆，该接口为测试接口，仅限概念版使用）`](#组队领取-vip---获取本期活动信息需要登陆该接口为测试接口仅限概念版使用)
+152. [`组队领取VIP - 获取用户组队信息（需要登陆，该接口为测试接口，仅限概念版使用）`](#组队领取-vip---获取用户组队信息需要登陆该接口为测试接口仅限概念版使用)
+153. [`组队领取VIP - 获取用户自己的队伍信息（需要登陆，该接口为测试接口，仅限概念版使用）`](#组队领取-vip---获取用户自己的队伍信息需要登陆该接口为测试接口仅限概念版使用)
+154. [`组队领取VIP - 创建用户自己的组队队伍（需要登陆，该接口为测试接口，仅限概念版使用）`](#组队领取-vip---创建用户自己的组队队伍需要登陆该接口为测试接口仅限概念版使用)
+155. [`组队领取VIP - 加入组队队伍（需要登陆，该接口为测试接口，仅限概念版使用）`](#组队领取-vip---加入组队队伍需要登陆该接口为测试接口仅限概念版使用)
+156. [`音效 - 耳机列表`](#音效---耳机列表)
+157. [`音效 - 耳机音效`](#音效---耳机音效)
+158. [`音效 - 通用耳机音效`](#音效---通用耳机音效)
+159. [`音效 - 明星音效`](#音效---明星音效)
+160. [`音效 - 汽车列表`](#音效---汽车列表)
+161. [`音效 - 汽车音效`](#音效---汽车音效)
+162. [`获取歌曲弹幕`](#获取歌曲弹幕)
+163. [`发送歌曲弹幕`](#发送歌曲弹幕)
+164. [`获取视频弹幕`](#获取视频弹幕)
+165. [`发送视频弹幕`](#发送视频弹幕)
+166. [`发送歌曲评论`](#发送歌曲评论)
+167. [`发送歌单评论`](#发送歌单评论)
+168. [`发送专辑评论`](#发送专辑评论)
+169. [`发送楼层评论`](#发送楼层评论)
+170. [`批量查询概念版会员产品（YVipInfo）`](#批量查询概念版会员产品yvinfo)
+171. [`发送私信`](#发送私信)
+172. [`获取私信会话历史`](#获取私信会话历史)
+
+### 安装
+
+```shell
+$ git clone git@github.com:MakcRe/KuGouMusicApi.git
+$ cd KuGouMusicApi
+$ npm install
+```
+
+### 使用接口为概念版
+
+```
+$ 复制 .env.example 为 .env，并且把里面的 `platform=''` 改为 `platform=lite`
+$ 注意不同版本的平台的 token 是不通用的。
+```
+
+### 运行
+
+```shell
+$ npm run dev
+```
+
+服务器启动默认端口为 3000, 若不想使用 3000 端口 , 可使用以下命令 : Mac/Linux
+
+```shell
+$ PORT=4000 npm run dev
+```
+
+windows 下使用 git-bash 或者 cmder 等终端执行以下命令 :
+
+```shell
+$ set PORT=4000 && npm run dev
+```
+
+windows 下使用 PowerShell 终端执行一下命令 :
+
+```shell
+$ $Env:PORT=4000; npm run dev
+```
+
+服务器启动默认 host 为 localhost,如果需要更改, 可使用以下命令 : Mac/Linux
+
+```shell
+$ HOST=127.0.0.1 npm run dev
+```
+
+windows 下使用 git-bash 或者 cmder 等终端执行以下命令 :
+
+```shell
+$ set HOST=127.0.0.1 && npm run dev
+```
+
+## 免责声明
+
+!> 1. 本项目仅供学习使用，请尊重版权，请勿利用此项目从事商业行为及非法用途!
+
+!> 2. 使用本项目的过程中可能会产生版权数据。对于这些版权数据，本项目不拥有它们的所有权。为了避免侵权，使用者务必在 24 小时内清除使用本项目的过程中所产
+生的版权数据。
+
+!> 3. 由于使用本项目产生的包括由于本协议或由于使用或无法使用本项目而引起的任何性质的任何直接、间接、特殊、偶然或结果性损害（包括但不限于因商誉损失、停
+工、计算机故障或故障引起的损害赔偿，或任何及所有其他商业损害或损失）由使用者负责。
+
+!> 4. **禁止在违反当地法律法规的情况下使用本项目。** 对于使用者在明知或不知当地法律法规不允许的情况下使用本项目所造成的任何违法违规行为由使用者承担，
+本项目不承担由此造成的任何直接、间接、特殊、偶然或结果性责任。
+
+!> 5. 音乐平台不易，请尊重版权，支持正版。
+
+!> 6. 本项目仅用于对技术可行性的探索及研究，不接受任何商业（包括但不限于广告等）合作及捐赠。
+
+!> 7. 如果官方音乐平台觉得本项目不妥，可联系本项目更改或移除。
+
+## Vercel 部署
+
+### 操作方法
+
+1. fork 此项目
+2. 在 Vercel 官网点击 `New Project`
+3. 点击 `Import Git Repository` 并选择你 fork 的此项目并点击 `import`
+4. 点击 `PERSONAL ACCOUNT` 的 `select`
+5. 直接点 `Continue`
+6. 若需要部署版本为概念版（不需要该步骤可以跳过），在 `Environment Variables` 添加 `key` 为 `platform`，`Value (Will Be Encrypted)` 为 `lite` 然后点击
+   `Add`
+7. `PROJECT NAME`自己填,`FRAMEWORK PRESET` 选 `Other` 然后直接点 `Deploy` 接着等部署完成即可
+
+## 接口文档
+
+### 调用前须知
+
+!> 本项目不提供线上 demo，请不要轻易信任使用他人提供的公开服务，以免发生安全问题,泄露自己的账号和密码
+
+!> 为使用方便,降低门槛, 文档示例接口直接使用了 GET 请求,本项目同时支持 GET/POST 请按实际需求使用 (POST 请求 url 必须添加时间戳,使每次请求 url 不一样,
+不然请求会被缓存)
+
+!> 由于接口做了缓存处理 ( 缓存 2 分钟,), 相同的 url 会在两分钟内只向酷狗服务器发一次请求 , 如果遇到不需要缓 存结果的接口 , 可在请求 url 后面加一个时间
+戳参数使 url 不同 , 例子 : /personal/fm?timestamp=1691256061923 (请按自己需求改造缓存中间件(app.js)，源码不复杂) 该缓存机制来源
+于[Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
+
+!> 不要频繁调登录接口,不然可能会被风控,登录状态还存在就不要重复调登录接口
+
+!> 如果是跨域请求 , 请在所有请求带上 xhrFields: { withCredentials: true } (axios 为 withCredentials: true, Fetch API 为 fetch(url, { credentials:
+'include' })), 或直接手动传入 cookie。
+
+!> 本项目仅供学习使用,请尊重版权，请勿利用此项目从事商业行为或进行破坏版权行为
+
+!> 文档可能会有缓存 , 如果文档版本和 github 上的版本不一致,请清除缓存再查看
+
+#### 更新记录
+
+26-09-18：添加 `批量查询概念版会员产品（YVipInfo）` 接口，`歌曲评论` 接口支持 `CMT_VER` 环境变量
+
+26-09-11：添加 `专辑动态封面`（dycover）接口
+
+26-08-25：添加 `音效 - 耳机列表` 、`音效 - 耳机音效`、 `音效 - 通用耳机音效`、`音效 - 明星音效`、`音效 - 汽车列表`、`音效 - 汽车音效` 接口
+
+26-08-25：添加 `概念版 - 免费听` 、`获取用户 Auth`、 `获取音乐 Auth`、`获取音乐 URL （Auth 版本）`、`获取音乐 URL （Auth 聚合版本）` 接口
+
+26-08-17：添加 `编辑内容黑名单`、`获取内容黑名单` 接口
+
+26-08-15：添加 `一起听（音乐室/众乐房）` 接口
+
+26-08-14：`获取社区音效` 接口支持 `sort` 参数排序
+
+26-08-13：添加模块`组队领取VIP`相关接口
+
+26-08-01：添加 `上传音乐到云盘`、`删除用户云盘音乐` 接口
+
+26-05-20：更新曲谱相关接口
+
+25-08-17: 手机登录添加支持多用户登录
+
+25-04-05: 添加 `用户云盘`，`用户云盘 url`, `获取用户收藏视频`，`获取用户喜欢视频` 等接口
+
+25-03-28：添加 `领取一天 VIP`, `获取当月已领取 VIP 天数`, `领取一天 VIP`,`获取已领取 VIP 状态`,`获取音乐 URL（新版）` 等接口
+
+25-03-07：更新单曲搜索接口，更新歌词搜索接口。
+
+25-01-16：添加 `获取继续播放信息` 接口，修复部分老歌在概念版无法获取问题
+
+25-01-11：添加 `关注歌手` `取消关注歌手` `获取关注歌手新歌` 接口
+
+24-08-09：添加 获取更多音乐版本 接口。
+
+24-07-22：添加 `歌曲详情` 接口.
+
+24-07-17: 添加 搜索建议 接口。
+
+24-07-14: 添加 频道、听书等多个接口。
+
+24-07-14: 添加 刷刷、AI 推荐 接口，更新 提交听歌历史 接口。
+
+24-06-30: 添加 获取歌手列表 接口
+
+24-06-25: 添加 默认搜索关键词、获取歌曲 MV、提交听歌历史等接口
+
+24-05-30: 添加曲谱接口
+
+24-05-19: 修复设备平台判断问题，添加 获取用户关注歌手 接口
+
+24-05-14: 添加 楼层评论、歌单评论、专辑评论、热搜列表接口。修复 歌单 接口
+
+24-05-14: 添加 歌曲评论、歌曲评论-根据分类返回、歌曲评论-根据热词返回 接口
+
+24-05-12: 添加支持酷狗概念版登录
+
+24-05-07: 修复热门歌单接口
+
+24-01-17: 添加：排行榜列表接口、排行榜推荐列表接口、排行榜往期列表接口、排行榜信息接口、排行榜歌曲列表接口
+
+24-01-12: 更新私人 FM 接口
+
+24-01-07: 添加 每日推荐、历史推荐、 风格推荐 API 接口
+
+23-12-19: 添加场景音乐相关接口
+
+23-12-18: 添加 收藏歌单，取消收藏歌单，对歌单添加歌曲，对歌单删除歌曲 接口
+
+23-11-10: 添加歌手相关 API、添加视频相关 API
+
+23-10-01: 添加领取 vip 接口
+
+23-08-27: 更新音乐 url 获取
+
+23-08-11: 添加电台 api
+
+23-08-06: 添加缓存机制
+
+23-07-19: 更新酷狗二维码登录
+
+23-06-29: 添加 新歌速递、乐库等多个接口
+
+23-06-28: 添加获取歌手图片接口
+
+23-06-25: 添加 每日主题音乐 获取每日主题音乐详情 歌单 等接口
+
+23-06-23: 修复搜索接口
+
+23-06-23: 添加 搜索、获取歌词等接口
+
+23-06-23: 添加 获取音乐 URL 接口
+
+23-06-23: 更新文档
+
+23-06-23: 添加每日歌曲推荐、专辑详情、专辑音乐列表、新碟上架
+
+23-06-22: 添加支持微信登录、开放接口登录
+
+23-06-22: 添加支持 vercel
+
+23-06-22: 密码登录、验证码登录、扫码登录
+
+### 登录
+
+说明：登录有五个接口使用 `encodeURIComponent`对密码编码或者使用 `POST`请求，避免某些特殊字符无法解析,如#(#在 url 中会被识别为 hash,而不是 query)
+
+不要频繁调登录接口,不然可能会被风控,登录状态还存在就不要重复调登录接口, **不同版本的 token 是不通用的**
+
+#### 1.手机登录
+
+**必选参数：**
+
+`mobile`: 手机号码
+
+`code`: 验证码，使用 [`/captcha/sent`](#发送验证码)接口传入手机号获取验证码,调用此接口传入验证码,可使用验证码登录
+
+**可选参数**
+
+`userid`: 用户 id,当用户存在多个账户是时，必须加上需要登录的用户 id
+
+**接口地址：** `/login/cellphone`
+
+**调用例子：** `/login/cellphone?mobile=xxx&code=xxx`
+
+#### 2. 用户名登录(该登录可能需要验证，不推荐使用)
+
+**必选参数：**
+
+`username`: 用户名
+
+`password`: 密码
+
+**接口地址：** `/login`
+
+**调用例子：** `/login?username=xxx&password=yyy`
+
+#### 3. 微信开放接口登录
+
+说明: 该接口仅用于微信登录，接收微信扫码成功后生成的 `code`。微信与 QQ 的授权参数不通用，QQ 登录请使用 [`/login/qq`](#_4-qq-授权登录)。
+
+**必选参数：**
+
+`code`: 由微信扫码成功后生成
+
+**接口地址：** `/login/openplat`
+
+**调用例子：** `/login/openplat?code=xxx`
+
+#### 4. QQ 授权登录
+
+说明: 该接口仅用于 QQ 登录，接收 QQ 开放平台授权返回的 `openid` 与 `access_token`，并通过酷狗 `login_by_openplat` 换取酷狗登录态。QQ 与微信的授权参数
+不通用，不能把微信 `code` 传给该接口，也不能把 QQ 参数传给 `/login/openplat`。
+
+**必选参数：**
+
+`openid`: QQ 授权返回的 openid
+
+`access_token`: QQ 授权返回的 access_token
+
+**接口地址：** `/login/qq`
+
+**调用例子：** `/login/qq?openid=xxx&access_token=yyy`
+
+> QQ 登录的 `openid` 与 `access_token` 需通过 QQ 开放平台授权获取（`openmobile.qq.com/oauth2.0/m_authorize`，client_id 按平台自动选择：概念版
+> `101706348`、标准版 `205141`）。`third_appid` 会根据 `platform` 环境变量自动选择。
+
+#### 5. 二维码登录
+
+说明: 二维码登录涉及到 3 个接口,调用务必带上时间戳,防止缓存
+
+##### 1.二维码 key 生成接口
+
+说明: 调用此接口可生成一个 key
+
+**接口地址：** `/login/qr/key`
+
+##### 2.二维码生成接口
+
+说明: 调用此接口传入上一个接口生成的 key 可生成二维码图片的 base64 和二维码信息,可使用 base64 展示图片,或者使用二维码信息内容自行使用第三方二维码生成
+库渲染二维码
+
+**必选参数：**
+
+`key`: ,由第一个接口生成
+
+**可选参数：**
+
+`qrimg`: 传入后会额外返回二维码图片 base64 编码
+
+**接口地址：** `/login/qr/create`
+
+**调用例子：** `/login/qr/create?key=xxx`
+
+##### 2.二维码检测扫码状态接口
+
+说明: 轮询此接口可获取二维码扫码状态,0 为二维码过期，1 为等待扫码，2 为待确认，4 为授权登录成功（4 状态码下会返回 token）
+
+**必选参数：**
+
+`key`: ,由第一个接口生成
+
+**接口地址：** `/login/qr/check`
+
+**调用例子：** `/login/qr/check?key=xxx`
+
+##### 3. 二维码授权登录接口
+
+说明: 登陆后调用此接口，授权其他设备登录
+
+**必选参数：**
+
+`qrcode`: 二维码 key，从新设备登录二维码中提取
+
+`cookie`: 含已登录账号的 `token`、`userid`
+
+**可选参数：**
+
+`appid`: 未传时使用服务器当前平台配置的 appid，必须与当前 token 对应平台一致
+
+`plat`: 请求体 plat 字段，默认 `1`，传入 `2` 时使用 `2`
+
+**接口地址：** `/login/qr/authorize`
+
+**调用例子：** `/login/qr/authorize?qrcode=xxx&cookie=token%3Dxxx%3B%20userid%3Dxxx`
+
+#### 6. 微信扫码登录
+
+说明：微信扫码登录涉及到 2 个接口,调用务必带上时间戳,防止缓存。该流程使用微信的 `uuid` / `wx_code`，不适用于 QQ 扫码登录。
+
+##### 1. 二维码生成接口
+
+说明：调用此接口可生成微信的 uuid, 包括二维码 Bae64 和 二维码扫描链接, 注: 该接口请求的接口过多, 会出现返回较慢的情况
+
+**接口地址：** `/login/wx/create`
+
+**调用例子：** `/login/wx/create`
+
+##### 2. 微信二维码检测扫码状态接口
+
+说明：轮询微信接口可获取二维码扫码状态, 408 为等待扫描，404 为已经扫描，403 为拒绝登录，405 为登录成功，402 为已过期(405 状态下登陆完成口会返回
+wx_code, 用于开放登陆 [`/login/openplat`](#_3-微信开放接口登录)), 注：该接口有一定延时，不可访问是可以直接到
+https://long.open.weixin.qq.com/connect/l/qrconnect?f=json&uuid=xxx 该接口直接请求
+
+**必选参数：**
+
+`uuid`: 由第一个接口生成
+
+**可选参数：**
+
+`timestamp`: 建议传递，否则由于缓存会导致延迟
+
+**接口地址：** `/login/wx/check`
+
+**调用例子：** `/login/wx/check?timestamp=1691256061923&uuid=xxxxxxxxx`
+
+#### 7. QQ 扫码登录
+
+说明：QQ 扫码登录涉及 2 个接口，同样是“生成二维码 → 轮询扫码状态 → 换取酷狗登录态”的流程，但 QQ 使用 `qrsig` / `ptqrtoken` / `openid` /
+`access_token`，与微信的 `uuid` / `code` 不通用，也不会请求 `long.open.weixin.qq.com`。
+
+##### 1. 二维码生成接口
+
+说明：调用此接口可生成 QQ 扫码登录二维码，返回二维码图片 base64、qrsig、ptqrtoken 等会话信息
+
+**接口地址：** `/login/qq/qr/create`
+
+**调用例子：** `/login/qq/qr/create`
+
+返回参数说明：
+
+- `qrcode`: 二维码图片 base64（可直接用 `<img src="data:image/png;base64,xxx">` 展示）
+- `qrsig`: 二维码会话标识
+- `ptqrtoken`: qrsig 的 hash33 值
+- `pt_login_sig`: QQ 登录签名
+- `pt_openlogin_data`: xlogin 完整参数（含 h5sig），轮询扫码状态时需要
+- `xlogin_url`: xlogin 接口完整链接（作为轮询请求的 Referer）
+- `cookie`: 会话 Cookie
+
+##### 2. QQ 二维码检测扫码状态接口
+
+说明：轮询 QQ `ptqrlogin` 接口可获取二维码扫码状态，扫码成功后会自动完成酷狗账号登录并返回 token
+
+**必选参数：**
+
+`qrsig`: 由第一个接口生成
+
+`ptqrtoken`: 由第一个接口生成
+
+`pt_login_sig`: 由第一个接口生成
+
+`pt_openlogin_data`: 由第一个接口生成，需原样传递，否则扫码成功后可能无法直接获取 `openid` / `access_token`
+
+`xlogin_url`: 由第一个接口生成（作为轮询请求的 Referer）
+
+`cookie`: 由第一个接口生成，需原样传递（包含 QQ 扫码会话 Cookie，如 `qrsig`）
+
+**可选参数：**
+
+`timestamp`: 建议放在 URL query 中传递（包括 POST 请求），否则由于 2 分钟 URL 缓存会导致延迟
+
+**接口地址：** `/login/qq/qr/check`
+
+**调用例子：** 将 `/login/qq/qr/create` 返回的会话字段通过 GET query 原样传入；`pt_openlogin_data`、`xlogin_url`、`cookie` 需 URL 编码：
+
+```text
+/login/qq/qr/check?timestamp=1691256061923&qrsig=xxx&ptqrtoken=xxx&pt_login_sig=xxx&pt_openlogin_data=xxx&xlogin_url=xxx&cookie=pt_login_sig%3Dxxx%3B%20qrsig%3Dxxx
+```
+
+返回状态说明：
+
+- `wait`: 等待扫码
+- `expired`: 二维码已失效，需重新调用 create 生成
+- `status: 1`: 登录成功，返回酷狗 token（通过 `/login/qq` 相同流程的 login_by_openplat 换取）
+
+> QQ 扫码登录的 `client_id` 按平台自动选择：概念版 `101706348`、标准版 `205141`。
+>
+> 流程说明（与酷狗 App 内 QQ 扫码登录一致）：
+>
+> 1. `m_authorize`（style=qr）→ `xlogin`（获取 pt_login_sig cookie 及 h5sig）→ `ptqrshow`（二维码）
+> 2. 轮询 `ptqrlogin`，需携带 `pt_openlogin_data`（xlogin 完整参数）、`login_sig`、`qrsig` cookie
+> 3. 扫码成功后直接返回 proxy.htm URL（含 openid + access_token），调用 `login_by_openplat` 换取酷狗 token
+
+### 刷新登录
+
+说明 : 调用此接口，可刷新登录状态，可以延长 `token` 过期时间
+
+**可选参数：**
+
+`token`: 登录后获取的 token
+
+`userid`: 用户 id
+
+**接口地址：** `/login/token`
+
+**调用例子：** `/login/token` `/login/token?token=xxx&userid=xxx`
+
+### 发送验证码
+
+说明: 调用此接口 ,传入手机号码, 可发送验证码
+
+**必选参数：**
+
+`mobile`: 手机号码
+
+**接口地址：** `/captcha/sent`
+
+**调用例子：** `/captcha/sent?mobile=xxx`
+
+### dfid 获取
+
+**接口地址：** `/register/dev`
+
+**调用例子：** `/register/dev`
+
+### 获取用户额外信息
+
+说明：登陆后调用此接口，可以获取用户额外信息
+
+**接口地址：** `/user/detail`
+
+### 获取用户 Auth
+
+说明：登陆后调用此接口，可以获取 auth，`/song/auth` 需要获取该接口数据
+
+**接口地址：** `/user/verify`
+
+**返回示例：**
+
+```json
+{
+  "data": {
+    "valid": 1,
+    "auth": "xxx:xxx"
+  },
+  "status": 1,
+  "error_code": 0
+}
+```
+
+### 获取用户 vip 信息
+
+说明：登陆后调用此接口，可以获取用户 vip 信息
+
+**接口地址：** `/user/vip/detail`
+
+### 批量查询概念版会员产品（YVipInfo）
+
+说明：调用此接口 , 可批量查询多个用户（如歌曲评论作者）的概念版会员产品信息（对应概念版 KugouYoung `YVipInfoMemoryManager`），不需要登录即可查询他人
+
+**必选参数：**
+
+`useridlist`：用户 id 列表，最多 20 个，可用数组、逗号/空格分隔的字符串或单个数字（别名：`userids`、`userid_list`）
+
+**可选参数：**
+
+`kugouid`：当前账号 kugouid（别名：`userid`，也可从 cookie 的 `userid` 字段读取）
+
+`clienttoken`：客户端 token（别名：`token`，也可从 cookie 的 `token` 字段读取）
+
+`get_type`：默认 `2`
+
+`busi_type`：业务类型，默认 `concept`
+
+`clientappid`：客户端 appid，默认从 cookie 的 `appid` 字段读取
+
+**接口地址：** `/user/batch/union/vipinfo`
+
+**调用例子：** `/user/batch/union/vipinfo?useridlist=123456789,987654321`
+
+> 该接口用于在评论列表（`/comment/music`）中解析作者的概念版会员信息：可将评论返回的 `kugouyoung` 用户 id 批量传入，从而判断该作者是否为概念版会员。
+
+### 获取用户歌单
+
+说明：登录后调用此接口，可以获取用户的所有创建以及收藏的歌单
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/user/playlist`
+
+**调用例子：** `/user/playlist`
+
+### 获取用户关注列表
+
+说明：登录后调用此接口，可以获取用户的所有关注的歌手/用户
+
+**接口地址：** `/user/follow`
+
+**调用例子：** `/user/follow`
+
+### 获取好友列表
+
+说明：登录后调用此接口，获取当前账号的好友列表。
+
+**可选参数：**
+
+`page` / `pagesize`：分页参数（协议支持透传，服务端可能按全量返回）
+
+**接口地址：** `/user/friends`
+
+**调用例子：** `/user/friends`
+
+### 获取粉丝列表
+
+说明：登录后调用此接口，获取当前账号的粉丝列表。
+
+**接口地址：** `/user/fans`
+
+**调用例子：** `/user/fans`
+
+### 获取访客列表
+
+说明：登录后调用此接口，获取主页访客记录
+
+**可选参数：**
+
+`t_userid` / `visit_userid`：要查看的访客归属用户 ID，默认查自己
+
+`page`：页码，默认 1
+
+**接口地址：** `/user/visitors`
+
+**调用例子：** `/user/visitors?t_userid=123`
+
+### 获取私信会话历史
+
+说明：登录后调用此接口，可以获取用户的私信会话历史
+
+`id`: 需要获取用户消息的 userid，按普通会话构造 tag（`chat:对方uid_自己uid`）
+
+`tag`: 直接指定会话标识（传 tag 时忽略 id）。普通会话为 `chat:对方uid_自己uid`；官方系统会话（如账号安全小助手）为 `mchat:官方uid`，例如 `mchat:1270119904`；互动通知分类（与消息中心分类页同源）：`fans`=新增粉丝、`visitremind`=主页访客、`comments`=评论、`star`=获赞、`tome`=@我、`kgift`=礼物
+
+`pagesize `: 每页页数, 默认为 30
+
+`maxid`: 翻页游标，默认 0（从最新开始）
+
+**接口地址：** `/user/follow/message`
+
+**调用例子：** `/user/follow/message?id=123` 或 `/user/follow/message?tag=mchat:1270119904`
+
+### 发送私信
+
+说明：调用此接口，向指定酷狗用户发送一条私信，支持文本、图片、表情。
+
+陌生人限流：对方未关注且未回复前，最多可发送 3 条打招呼消息
+
+- 额度内：`errcode=0`，正常返回 `data.msgid`；发送第 1、3 条时响应会带 `tip_content` 额度提醒，但消息仍送达
+- 超限后：`errcode=3006`、`status=0`，`error` 为"需要对方关注或回复后才能恢复正常聊天"，消息被拒绝
+- 对方关注或回复后会话立即解锁，恢复后响应不再携带 `tip_content`
+
+**必选参数（二选一）：**
+
+`tuid`：目标用户酷狗 id，首次给对方发消息时使用
+
+`tag`：会话标识，形如 `chat:对方uid_自己uid`，已建立会话后回信用（首次发送成功后响应会返回该值）
+
+**文本消息（msgtype=201，默认）：**
+
+`alert`：文本内容，必填
+
+**图片消息（msgtype=202）：** 以下两种方式二选一
+
+- 方式一（已上传的图片）：传 `url`（酷狗 BSS 图片地址，形如 `http://imagemsg.bssdl.kugou.com/xxx.jpg`）。也可传任意第三方图片直链，服务端不校验 url 域名、原样存储下发；客户端能否正常显示取决于其对格式/协议的支持，可选 `width`/`height`
+- 方式二（本地图片自动上传）：通过二进制请求体传入图片（`Content-Type: application/octet-stream`，编程式调用时为 `data` Buffer），或 `imgFile` 传 base64/dataURL 字符串。模块自动执行「获取上传授权 → 直传 bssul 对象存储 → 回填 url」流程后发送
+
+图片可选参数：`isOriginal` 是否原图（原图走 bssdlbig 下载域名）、`originalSize` 原图字节数、`extendname` 扩展名（默认 jpg）
+
+**表情消息（msgtype=205）：**
+
+`url`：表情图片地址（必填）；`thumbUrl`：缩略图地址（必填）。表情为平台现成资源，无需上传
+
+**通用可选参数：**
+
+`nickname`：发送者昵称，仅展示用
+
+`source`：发送来源，默认 0；5 为群聊场景，需配合 `groupid`
+
+`groupid`：群 id，仅 `source=5` 时需要
+
+`fakeid`：官方助手/机器人会话身份 id，从收到的消息中原样回传
+
+`retry`：重发标记，传 `true` 时请求体携带 `retry: 1`
+
+**接口地址：** `/user/follow/chat`
+
+**调用例子：**
+
+```bash
+# 首次给用户 123 发送文本私信
+curl -X POST http://127.0.0.1:3000/user/follow/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","tuid":123,"alert":"你好"}'
+
+# 已建立会话后使用 tag 回信
+curl -X POST http://127.0.0.1:3000/user/follow/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","tag":"chat:123_456","alert":"收到"}'
+
+# 发送表情
+curl -X POST http://127.0.0.1:3000/user/follow/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","tuid":123,"msgtype":205,"url":"表情地址","thumbUrl":"缩略图地址"}'
+
+# 发送本地图片（二进制直传）
+curl -X POST "http://127.0.0.1:3000/user/follow/chat?cookie=token%3Dxxx%3Buserid%3Dxxx&tuid=123&msgtype=202" \
+  -H 'Content-Type: application/octet-stream' \
+  --data-binary @/path/to/image.jpg
+```
+
+### 获取用户云盘
+
+说明：登录后调用此接口可以获取用户上传到云盘的音乐（需要登录）
+
+**可选参数**
+
+`page `: 页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/user/cloud`
+
+**调用例子：** `/user/cloud`
+
+### 获取用户云盘音乐 URL
+
+说明：登录后调用此接口可以获取用户上传到云盘的音乐 URL，部分可以直接用 `/song/url` 直接获取 URL（需要登录，目前获取到的文件大小都约为 10M 左右）
+
+**必选参数：**
+
+`hash`: 音乐 hash
+
+**可选参数：**
+
+`album_id`: 专辑 id
+
+`name`: 云盘音乐名称
+
+`album_audio_id`：专辑音频 id
+
+**接口地址：** `/user/cloud/url`
+
+**调用例子：** `/user/cloud/url`
+
+### 删除用户云盘音乐
+
+说明：登录后调用此接口可以删除用户云盘中的音乐（需要登录）
+
+**必选参数：**
+
+`fileid`: 云盘文件 ID（列表接口返回的 `kv_id`），多个可用逗号分隔；也可使用 `fileids` 传数组
+
+**可选参数：**
+
+`clientver`: 覆盖客户端版本号，默认使用当前平台配置
+
+`appid`: 覆盖 appid，默认使用当前平台配置
+
+`kv_id`: `fileid` 别名
+
+`album_audio_id`: 专辑音频 ID（列表接口返回的 `album_audio_id`），多个可用逗号分隔；也可使用 `album_audio_ids` 传数组
+
+**接口地址：** `/user/cloud/del`
+
+**调用例子：** `/user/cloud/del?fileid=1&album_audio_id=123`
+
+### 云盘上传前曲库匹配
+
+说明：登录后调用此接口可以根据文件 hash 匹配曲库信息，用于上传前获取 `hash_std`、`audio_id`、`album_audio_id`
+
+**必选参数：**
+
+`hash`: 文件 hash（即文件 MD5），多个可用逗号分隔；也可通过请求体传入文件二进制数据自动计算
+
+**可选参数：**
+
+`album_audio_id`: 专辑音频 ID，已有时可辅助匹配，多个可用逗号分隔；也可使用 `album_audio_ids` 传数组
+
+`clientver`: 覆盖客户端版本号，默认使用当前平台配置
+
+`appid`: 覆盖 appid，默认使用当前平台配置
+
+**接口地址：** `/user/cloud/match`
+
+**调用例子：** `/user/cloud/match?hash=e1fe087ba28766b8c95239487a0e46dc`
+
+### 上传音乐到云盘
+
+说明：登录后调用此接口可以将音乐文件上传到用户云盘，需通过请求体传入文件二进制数据（`Content-Type: application/octet-stream`）  
+默认会先根据文件 hash 调用曲库匹配接口，并将匹配到的 `hash_std`、`audio_id`、`album_audio_id` 写入云盘；手动传入这些参数时会优先使用手动值
+
+**必选参数：**
+
+无
+
+**可选参数：**
+
+`filename`: 文件 hash（即文件 MD5），默认自动计算
+
+`extendname`: 文件扩展名，默认为 `mp3`（自动去掉点号）
+
+`name`: 云盘音乐显示名称，默认格式为 `歌手名 - MD5.扩展名`
+
+`author_name`: 歌手名
+
+`hash_std`: 曲库标准 hash，默认自动匹配
+
+`audio_id`: 音频 id，默认为 0
+
+`album_audio_id`: 专辑音频 id，默认为 0
+
+`auto_match`: 是否自动匹配曲库，默认 `1`；传 `0`、`false` 或 `no` 可关闭
+
+**接口地址：** `/user/cloud/upload`
+
+**调用例子：** `/user/cloud/upload`
+
+### 获取用户收藏的视频
+
+说明：登录后调用此接口可以获取用户收藏的视频（需要登录）
+
+**可选参数**
+
+`page `: 页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/user/video/collect`
+
+**调用例子：** `/user/video/collect`
+
+### 获取用户喜欢的视频
+
+说明：登录后调用此接口可以获取用户喜欢的视频（需要登录）
+
+**可选参数**
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/user/video/love`
+
+**调用例子：** `/user/video/love`
+
+### 获取用户听歌历史排行
+
+说明：登录后调用此接口，可以获取用户听歌历史排行
+
+**可选参数：**
+
+`type`：0 为获取最近一周前 120 首歌曲，1：获取全部累计前 120 首歌曲
+
+**接口地址：** `/user/listen`
+
+**调用例子：** `/user/listen`
+
+### 获取用户最近听歌历史
+
+说明：登录后调用此接口，可以近期的听歌历史记录(需要登陆)
+
+**可选参数：**
+
+`bp`: 可以更加上一次返回值传入
+
+**接口地址：** `/user/history`
+
+**调用例子：** `/user/history`
+
+### 获取听歌偏好设置
+
+说明：登录后调用此接口，可以获取用户的听歌偏好设置（性别、年龄段、语言、风格等）
+
+**可选参数：**
+
+`token`: 登录令牌（也可通过 cookie、request body 传递）
+
+**接口地址：** `/user/preference`
+
+**调用例子：** `/user/preference`
+
+**返回示例：**
+
+```json
+{
+  "error_code": 0,
+  "errmsg": "",
+  "data": {
+    "age": "2",
+    "gender": "2",
+    "lang": "{\"1\":100}",
+    "style": "{\"1\":100,\"3\":50}",
+    "mode": "",
+    "song_lang": "",
+    "song_style": "",
+    "wish_taglist": "",
+    "inactive_taglist": "",
+    "inactive_singerlist": "",
+    "stylerec_taglist": "",
+    "taskcenter_conf": "",
+    "android_info": ""
+  },
+  "status": 1
+}
+```
+
+其中 `lang`/`style` 为基础偏好 JSON 字符串；`song_lang` 为推荐强度 JSON 字符串，格式为 `{标签id:权重}`，**50 为默认强度，低于 50 减少推荐，高于 50 加大推荐，0 屏蔽**。两组字段的标签 ID 独立，不应互相转换；`gender`/`age` 为单个 id 字符串。
+
+### 更新听歌偏好设置
+
+说明：登录后调用此接口，可以更新用户的听歌偏好设置。更新字段：`gender`/`age` 直接传 id，`lang`/`style`/`song_lang` 传 JSON 字符串（URL 传递时注意将 `{`、`"` 编码，或改放 request body）。传空字符串可清除对应项。
+
+**可选参数：**（至少提供一项）
+
+`mode`: 推荐模式，`0` 默认、`1` 熟悉、`2` 尝鲜
+
+`gender`: 性别 id
+
+`age`: 年龄段 id
+
+`lang`: 语言偏好 JSON 字符串
+
+`style`: 风格偏好 JSON 字符串
+
+`song_lang`: 推荐强度 JSON 字符串，权重为 0–100（0 屏蔽、50 默认、100 加大）。标签：`L1` 国语、`L2` 英语、`L5` 粤语、`L4` 韩语、`L3` 日语、`L6` 纯音乐、`S9` DJ、`T1` 翻唱、`N2` 现场、`S28` AI 歌曲。
+
+推荐模式及强度标签依据[酷狗官方偏好页面](https://h5.kugou.com/settings/v-3e4978eb/index.html)。语种不可全部屏蔽；加大 DJ 强度时不可同时屏蔽翻唱。
+
+`stylerec_taglist`: 推荐风格标签
+
+`wish_taglist`: 想要听的标签
+
+`inactive_taglist`: 不想听的标签
+
+`inactive_singerlist`: 不想听的歌手
+
+**接口地址：** `/user/preference/update`
+
+**调用例子：** （设置：男 + 90后 + 国语 + 流行）
+
+```
+/user/preference/update?gender=2&age=2&lang={"1":100}&style={"1":100}
+```
+
+URL 编码写法：`/user/preference/update?gender=2&age=2&lang=%7B%221%22%3A100%7D&style=%7B%221%22%3A100%7D`
+
+清除某字段：`/user/preference/update?lang=` （空字符串）
+
+**字段取值表（标准版安卓客户端）：**
+
+性别 `gender`:
+
+| id | 含义 |
+|-----|------|
+| 1 | 女 |
+| 2 | 男 |
+
+年龄段 `age`:
+
+| id | 含义 | id | 含义 |
+|-----|------|-----|------|
+| 0 | 其它 | 9 | 85后 |
+| 1 | 00后 | 10 | 75后 |
+| 2 | 90后 | 11 | 65后 |
+| 3 | 80后 | 12 | 60后 |
+| 4 | 70后 | 6 | 10后 |
+| 7 | 05后 | 8 | 95后 |
+
+语言 `lang`:
+
+| id | 含义 | id | 含义 |
+|-----|------|-----|------|
+| 1 | 国语 | 9 | 意大利语 |
+| 2 | 粤语 | 11 | 葡萄牙语 |
+| 4 | 英语 | 13 | 俄语 |
+| 5 | 日语 | 18 | 小语种 |
+| 6 | 韩语 | 19 | 闽南语 |
+| 7 | 德语 | 20 | 藏语 |
+| 8 | 法语 | 21 | 泰语 |
+| | | 22 | 越南语 |
+
+风格 `style`:
+
+| id | 含义 | id | 含义 |
+|-----|------|-----|------|
+| 1 | 流行 | 10 | 民谣 |
+| 2 | 摇滚 | 12 | 乡村 |
+| 3 | 电子 | 14 | R&B |
+| 4 | 古典乐 | 15 | DJ |
+| 5 | 舞曲 | 16 | ACG |
+| 6 | 嘻哈 | 21 | 国风 |
+| 7 | 爵士 | 23 | 传统民歌 |
+| 9 | 纯音乐 |
+
+> 注：以上为标准版安卓的标签 id，不同平台/市场可能存在差异。
+
+### 获取继续播放信息（对应手机版首页显示继续播放入口）
+
+说明：登录后调用此接口，可以最后设备播放信息(需要登陆)
+
+**可选参数：**
+
+`pagesize`: 每页页数, 默认为 30
+
+**接口地址：** `/lastest/songs/listen`
+
+**调用例子：** `/lastest/songs/listen`
+
+### 收藏歌单/新建歌单
+
+说明 : 调用此接口, 可收藏歌单/新建歌单( 需要登录 ), 收藏成功后建议使用 [`/playlist/tracks/add`](#对歌单添加歌曲) 把原歌单下的歌曲添加到新的歌单
+
+**必选参数：**
+
+name: 歌单名称
+
+list_create_userid: 歌单 list_create_userid
+
+list_create_listid: 歌单 list_create_listid
+
+**可选参数**
+
+`is_pri`: 是否设为隐私，0：公开，1：隐私，仅支持创建歌单时传入
+
+`type`: 1：为收藏歌单，0：创建歌单, 默认为 0
+
+`list_create_gid`：歌单 list_create_gid
+
+**接口地址：** `/playlist/add`
+
+**调用例子：** `/playlist/add?source=1&name=音乐一响%20纯爱登场.&list_create_userid=1782943844&list_create_listid=87`
+
+### 取消收藏歌单/删除歌单
+
+说明 : 调用此接口 , 取消收藏歌单( 需要登录 )
+
+**必选参数：**
+
+listid: 用户歌单 listid
+
+**接口地址：** `/playlist/del`
+
+**接口地址：** `/playlist/del?listid=xxx`
+
+### 对歌单添加歌曲
+
+说明 : 调用此接口 , 可以添加歌曲到歌单 ( 需要登录 )
+
+**必选参数：**
+
+listid: 用户歌单 listid
+
+data: 歌曲数据, 格式为 歌曲名称|歌曲 hash|专辑 id|(mixsongid/album_audio_id)，最少需要 歌曲名称以及歌曲 hash(若返回错误则需要全部参数)， 支持多个，每
+个以逗号分隔
+
+**接口地址：** `/playlist/tracks/add`
+
+**调用例子：** `/playlist/tracks/add?listid=1&data=我们应该算爱过吧|8E10D8825DDE03BCABBDE13E5A4150D2`
+`/playlist/tracks/add?listid=1&data=我们应该算爱过吧|8E10D8825DDE03BCABBDE13E5A4150D2|67026620|477417208`
+`/playlist/tracks/add?listid=1&data=我们应该算爱过吧|8E10D8825DDE03BCABBDE13E5A4150D2,我们应该算爱过吧|5015FC3FAB5B0C245556A1CC3C4DE355`
+
+### 对歌单删除歌曲
+
+说明 : 调用此接口 , 可以删除歌单某首歌曲 ( 需要登录 )
+
+**必选参数：**
+
+listid: 用户歌单 listid
+
+fileids: 歌单中歌曲的 fileid，可多个,用逗号隔开
+
+**接口地址：** `/playlist/tracks/del`
+
+**调用例子：** `/playlist/tracks/del?listid=1&fileids=xx` `/playlist/tracks/del?listid=1&fileids=xx,xx`
+
+### 对歌单内歌曲排序
+
+说明 : 调用此接口可以对歌单内歌曲进行排序 ( 需要登录 )
+
+**必选参数：**
+
+listid: 用户歌单 listid
+
+list_ver: 歌单列表版本号
+
+data: 排序数据, 格式为 `fileid|sort`，每个以逗号分隔
+
+**可选参数：**
+
+`type`: 歌单类型，0：自建歌单，1：收藏歌单，默认为 0
+
+**接口地址：** `/playlist/tracks/sort`
+
+**调用例子：** `/playlist/tracks/sort?listid=1&list_ver=3&data=120|2,130|0`
+
+### 对歌单列表排序
+
+说明 : 调用此接口可以对"我的歌单"列表进行排序 ( 需要登录 )
+
+**必选参数：**
+
+total_ver: 歌单总版本号
+
+data: 排序数据, 格式为 `listid|type|sort`，每个以逗号分隔
+
+**接口地址：** `/playlist/sort`
+
+**调用例子：** `/playlist/sort?total_ver=9&data=11|0|0,22|0|1,33|1|0`
+
+### 修改歌单封面
+
+说明 : 调用此接口可以修改"我的歌单"的封面（系统内置封面，需登录）
+
+> 说明：此接口用于设置**系统封面**（`stdmusic`），封面支持两种格式，完整封面 URL（`https://imge.kugou.com/stdmusic/{size}/xxx.jpg`）或云端相对路径（`stdmusic/xxx.jpg`），完整 URL 会自动取最后一段并补上 `stdmusic/` 前缀。若需设置**自定义封面**，请改用 `/playlist/update` 传入 `pic=custom/<FileName>`（见「上传图片」）。
+
+**必选参数：**
+
+total_ver: 歌单总版本号
+
+data: 封面数据, 格式为 `listid|type|pic`，每个以逗号分隔，pic 可为完整封面 URL 或 `stdmusic/xxx.jpg` 相对路径
+
+**可选参数：**
+
+`type`: 歌单类型，0：自建歌单，1：收藏歌单，默认为 0（也可在 data 中逐条指定）
+
+**接口地址：** `/playlist/pic`
+
+**调用例子：** `/playlist/pic?total_ver=9&data=11|0|stdmusic/20210111/20210111184454391203.jpg,22|1|http://imge.kugou.com/stdmusic/{size}/20210111/20210111184454391203.jpg`
+
+> 说明：如需设置自定义封面，请先调用 `/playlist/pic/upload` 上传图片获取 `FileName`，再调用 `/playlist/update` 并传入 `pic=custom/<FileName>`。
+
+### 上传图片
+
+说明 : 调用此接口可以上传一张图片（用于设置为歌单自定义封面）( 需要登录 )
+
+**必选参数：**
+
+file: 本地图片文件路径
+
+**可选参数：**
+
+`type`: 图片类型，默认为 `custom`
+
+`extendName`: 文件扩展名，默认为 `.jpg`
+
+`md5`: 上传校验值，默认自动生成（`MD5(日期yyyyMMdd + 盐值)`），一般无需传
+
+**接口地址：** `/playlist/pic/upload`
+
+**调用例子：** `POST /playlist/pic/upload`，body 传 JSON：`{"file":"/path/to/cover.jpg","cookie":"token=xxx;userid=xxx"}`，成功返回：`{"status":1,"FileName":"20260914120505590883.jpg"}`
+
+### 修改歌单信息
+
+说明 : 调用此接口可以修改"我的歌单"的名称、排序、标签、简介、自定义封面 ( 需要登录 )
+
+**必选参数：**
+
+listid: 用户歌单 listid
+
+total_ver: 歌单总版本号
+
+**可选参数：**
+
+`type`: 歌单类型，0：自建歌单，1：收藏歌单，默认为 0
+
+`name`: 歌单名称（缺省时不改动名称）
+
+`sort`: 歌单排序号，默认为 0
+
+`tags`: 歌单标签
+
+`intro`: 歌单简介
+
+`pic`: 自定义封面，格式为 `custom/<FileName>`（FileName 由 `/playlist/pic/upload` 返回）
+
+**接口地址：** `/playlist/update`
+
+**调用例子：** `/playlist/update?listid=11&total_ver=9&name=我的新歌单&sort=1&tags=华语,流行&intro=好听&pic=custom/20260914120505590883.jpg`
+
+### 一起听（音乐室/众乐房）
+
+说明：调用此接口可实现酷狗音乐"一起听"（音乐室/众乐房）相关功能，包括房间查询、创建、加入、离开、聊天、播放同步、点歌等。
+
+> ⚠️ 前置条件：需要 `platform=lite`（概念版）模式 + 概念版登录态，`userid`/`token` 需通过 cookie 传递（rmservice 系接口的 userid 必须是数字）
+
+一起听按领域拆为 5 个接口，使用 `operation` 选择领域内操作：
+
+| 能力             | 路由                                                                                                                             |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 自习室           | `/listen/together/study`：`list/detail/members/configure/sync_player/playlist/request_song`                                      |
+| 众乐房           | `/listen/together/music`：`list/detail/members/initialize/sync_player/playlist/order_song/song_order_list/music_add/remove_song` |
+| 通用房间生命周期 | `/listen/together/room`：`create/join/heartbeat/status/leave/dismiss/check_minor`                                                |
+| 聊天             | `/listen/together/chat`：`send/history`                                                                                          |
+| 发现与频道       | `/listen/together/discovery`：`channel_search` 等公开发现能力                                                                    |
+
+查询参数和 JSON body 会在模块入口统一合并，复杂数组（例如 `audios`）建议放入 JSON body。
+
+> ⚠️ **缓存注意事项**：服务端对所有成功响应缓存 2 分钟，缓存键为 hostname + 完整 URL（含 query 参数）。请务必注意：
+>
+> **有副作用的操作**务必在 URL 末尾追加 `timestamp` 参数使每次请求 URL 不同，否则相同 URL 的重复调用会命中缓存，例如
+> ：`/listen/together/room?operation=join&timestamp=1691256061923`。
+
+### 导入外部歌单
+
+说明：登录后调用此接口，可通过外部歌单链接或歌单截图创建酷狗云端导入任务。接口统一使用 `POST /import/playlist`，通过请求体中的 `operation` 区分操作。
+
+HTTP 服务模式存在响应缓存，调用时建议附加变化的 `timestamp` 查询参数，例如 `/import/playlist?timestamp=1691256061923`。
+
+**链接导入**：`operation=add_task`、`task_type=0`、`url=外部歌单链接`。
+
+**截图导入**：先逐张调用 `operation=submit_img`，传入相同的 `task_sn` 与 `img_base64`；上传完成后调用 `operation=add_task`，传入
+`task_type=1`、`task_sn`、目标歌单 `listid` 和 `list_name`。`task_sn` 可使用 `userid + 毫秒时间戳`。
+
+**查询任务状态**：`operation=query_task_status`、`ids=[任务 ID]`。状态 `3` 表示成功，状态大于等于 `10` 表示失败，其余状态表示处理中。
+
+**查询导入结果**：`operation=query_task`、`listid=导入后的歌单 ID`，可选 `page`、`pagesize`、`show_missed`。注意这里的 `listid` 是歌单 ID，不是任务
+ID。
+
+**查询任务数量**：`operation=task_count`，可选 `classify`（默认 `1`）。
+
+### 新碟上架
+
+说明: 调用此接口 , 可获取新碟上架列表, 如需要专辑详细信息需要调用[`album/detail`](#专辑详情), 如需要获取专辑音乐列表需调
+用[`album/songs`](#专辑音乐列表)
+
+**可选参数：**
+
+`type `: 1：华语；2：欧美；3：日本；4：韩国；推荐为空，默认为空
+
+`page `: 页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/top/album`
+
+**调用例子：** `/top/album`
+
+### 专辑信息
+
+说明: 调用此接口 ,传入专辑 id 可获取专辑相关信息
+
+**必选参数：**
+
+`album_id`: 专辑 id,可以传多个，以逗号分割
+
+**可选参数：**
+
+`fields`: 需要返回的信息，可以传多个，以逗号分割，支持的值有 `trans_param` `special_tag` `authors` `album_name` `publish_date` `cover` `intro`
+`publish_company` `type` `album_id` `language_id` `is_publish` `heat` `grade` `quality` `exclusive` `grade_count` `author_name` `sizable_cover`
+`language` `category`
+
+**接口地址：** `/album`
+
+**调用例子：** `/album?album_id=xxx`, `/album?album_id=xxx,xxx`, `/album?album_id=xxx&fields=language,authors`
+
+### 专辑详情
+
+说明: 调用此接口 ,传入专辑 id 可获取专辑详情
+
+**必选参数：**
+
+`id`: 专辑 id
+
+**接口地址：** `/album/detail`
+
+**调用例子：** `/album/detail?id=10729818`
+
+### 专辑音乐列表
+
+说明: 调用此接口 ,传入专辑 id 可获取专辑音乐列表
+
+**必选参数：**
+
+`id`: 专辑 id
+
+**可选参数：**
+
+`page `: 页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/album/songs`
+
+**调用例子：** `/album/songs?id=10729818`
+
+### 专辑动态封面
+
+说明 : 调用此接口，传入专辑音乐 id 可获取该专辑的动态封面（短视频）信息.
+
+**必选参数：**
+
+`album_audio_id`: 专辑音乐 id, 可以传多个，每个以逗号分开
+
+**可选参数：**
+
+`album_id`: 专辑 id, 可以传多个，每个以逗号分开（可省略）
+
+`query`: 请求类型，默认为 `audioPlay`
+
+**接口地址：** `/album/dycover`
+
+**调用例子：** `/album/dycover?album_audio_id=468087825&album_id=65482908`
+
+> 提示：`album_audio_id` 可通过歌曲详情或搜索接口返回的 `album.album_audio_id` 字段获得。
+
+### 获取音乐 Auth
+
+说明：调用此接口，获取音乐 auth, 调用 `/song/auth/url` 需要改数据。
+
+**必选参数：**
+
+`hash`: 音乐 hash
+
+**可选参数：**
+
+`album_audio_id`：专辑音频 id
+
+`auth`：可以从 `/user/verify` 接口获取，如果不传默认会从 cookie 获取（需要之前获取过一次才会存入 cookie）
+
+**接口地址：** `/song/auth`
+
+**调用例子：** `/song/auth?hash=xxx`
+
+**返回示例**
+
+```json
+{
+  "data": {
+    "auth": "9e450275a91bdc564c49e31573837527",
+    "open_time": 1787673734
+  },
+  "status": 1,
+  "error_code": 0
+}
+```
+
+### 获取音乐 URL
+
+说明: 调用此接口, 传入的音乐 hash, 可以获取对应的音乐的 url, 未登录状态或者非会员可能会返回为空。
+
+⚠️ 注意：因接口问题，目前获取 url 接口数据需要先调用 `/register/dev` 接口获取 dfid，否则会提示 `本次请求需要验证`
+
+**必选参数：**
+
+`hash`: 音乐 hash
+
+**可选参数：**
+
+`album_id`: 专辑 id
+
+`free_part`: 是否返回试听部分（仅部分歌曲）
+
+`album_audio_id`：专辑音频 id
+
+`quality`：获取不同音质的 url
+
+**quality 支持的参数**
+
+`piano`：对应手机端魔法音乐 钢琴，仅部分音乐支持
+
+`acappella`：对应手机端魔法音乐 人声 伴奏，仅部分音乐支持，该模式下返回的音频后缀为 mkv 格式，该文加存在 人声 和 伴奏 两个音轨
+
+`subwoofer`：对应手机端魔法音乐 骨笛，仅部分音乐支持
+
+`ancient`：对应手机端魔法音乐 尤克里里，仅部分音乐支持
+
+`surnay`：对应手机端魔法音乐 唢呐，仅部分音乐支持
+
+`dj`：对应手机端魔法音乐 DJ，仅部分音乐支持
+
+`128`：返回 128 码率 mp3 格式
+
+`320`：返回 320 码率 mp3 格式
+
+`flac`：返回 flac 格式音频
+
+`high`：返回无损格式音频
+
+`viper_atmos`：蝰蛇全景声，仅部分音乐支持
+
+`viper_clear`：蝰蛇超清音质
+
+`viper_tape`：蝰蛇母带，仅部分音乐支持, 该音质需要转码，关于转码相关的技术还不会
+
+`super`：返回 DSD 格式音频，支持的音频少的可伶
+
+**接口地址：** `/song/url`
+
+**调用例子：** `/song/url?hash=xxx`
+
+### 获取音乐 URL（新版）
+
+说明: 调用此接口, 传入的音乐 hash, 可以获取对应的音乐的 url, 未登录状态或者非会员可能会返回为空，该接口会一次性返回支持的音质的音频 url, **但该接口存
+在音频加密（目前无法解码），请谨慎使用**
+
+⚠️ 注意：因接口问题，目前获取 url 接口数据需要先调用 `/register/dev` 接口获取 dfid，否则会提示 `本次请求需要验证`
+
+**必选参数：**
+
+`hash`: 音乐 hash
+
+**可选参数：**
+
+`album_audio_id`：专辑音频 id
+
+`free_part`: 是否返回试听部分（仅部分歌曲）
+
+`album_audio_id`：专辑音频 id
+
+**接口地址：** `/song/url/new`
+
+**调用例子：** `/song/url/new?hash=xxx`
+
+### 获取音乐 URL （Auth 版本）
+
+说明: 调用此接口, 传入的音乐 hash, 可以获取对应的音乐的 url，该接口需要再登录状态调用，非会员可以获取完整的 128 音质的音频，其他参数和 `/song/url` 一
+致，为兼容性暂时保留 `/song/url`，新版概念版部分请求开始使用该接口。
+
+⚠️ 注意：因接口问题，目前获取 url 接口数据需要先调用 `/register/dev` 接口获取 dfid，否则会提示 `本次请求需要验证`
+
+**必选参数：**
+
+`hash`: 音乐 hash
+
+`open_time`: 需要从 `/song/auth` 获取
+
+`auth`: 需要从 `/song/auth` 获取
+
+**可选参数：**
+
+`album_id`: 专辑 id
+
+`album_audio_id`：专辑音频 id
+
+`quality`：获取不同音质的 url
+
+**quality 支持的参数**
+
+`piano`：对应手机端魔法音乐 钢琴，仅部分音乐支持
+
+`acappella`：对应手机端魔法音乐 人声 伴奏，仅部分音乐支持，该模式下返回的音频后缀为 mkv 格式，该文加存在 人声 和 伴奏 两个音轨
+
+`subwoofer`：对应手机端魔法音乐 骨笛，仅部分音乐支持
+
+`ancient`：对应手机端魔法音乐 尤克里里，仅部分音乐支持
+
+`surnay`：对应手机端魔法音乐 唢呐，仅部分音乐支持
+
+`dj`：对应手机端魔法音乐 DJ，仅部分音乐支持
+
+`128`：返回 128 码率 mp3 格式
+
+`320`：返回 320 码率 mp3 格式
+
+`flac`：返回 flac 格式音频
+
+`high`：返回无损格式音频
+
+`viper_atmos`：蝰蛇全景声，仅部分音乐支持
+
+`viper_clear`：蝰蛇超清音质
+
+`viper_tape`：蝰蛇母带，仅部分音乐支持, 该音质需要转码，关于转码相关的技术还不会
+
+`super`：返回 DSD 格式音频，支持的音频少的可伶
+
+**接口地址：** `/song/url/auth`
+
+**调用例子：** `/song/url/auth?hash=xxx&open_time=xxx&auth=xxx`
+
+### 获取音乐 URL （Auth 聚合版本）
+
+说明: 该接口为 `/song/auth` 和 `/song/url/auth` 的聚合版本，不需要先调用 `/song/auth` 在调用 `/song/url/auth` 的繁琐机制。
+
+**必选参数：**
+
+`hash`: 音乐 hash
+
+`auth`：可以从 `/user/verify` 接口获取，如果不传默认会从 cookie 获取（需要之前获取过一次才会存入 cookie）
+
+**可选参数：**
+
+`album_id`: 专辑 id
+
+`album_audio_id`：专辑音频 id
+
+`quality`：获取不同音质的 url
+
+**quality 支持的参数**
+
+`piano`：对应手机端魔法音乐 钢琴，仅部分音乐支持
+
+`acappella`：对应手机端魔法音乐 人声 伴奏，仅部分音乐支持，该模式下返回的音频后缀为 mkv 格式，该文加存在 人声 和 伴奏 两个音轨
+
+`subwoofer`：对应手机端魔法音乐 骨笛，仅部分音乐支持
+
+`ancient`：对应手机端魔法音乐 尤克里里，仅部分音乐支持
+
+`surnay`：对应手机端魔法音乐 唢呐，仅部分音乐支持
+
+`dj`：对应手机端魔法音乐 DJ，仅部分音乐支持
+
+`128`：返回 128 码率 mp3 格式
+
+`320`：返回 320 码率 mp3 格式
+
+`flac`：返回 flac 格式音频
+
+`high`：返回无损格式音频
+
+`viper_atmos`：蝰蛇全景声，仅部分音乐支持
+
+`viper_clear`：蝰蛇超清音质
+
+`viper_tape`：蝰蛇母带，仅部分音乐支持, 该音质需要转码，关于转码相关的技术还不会
+
+`super`：返回 DSD 格式音频，支持的音频少的可伶
+
+**接口地址：** `/song/url/auth/merge`
+
+**调用例子：** `/song/url/auth/merge?hash=xxx`
+
+### 获取歌曲高潮部分
+
+说明: 调用此接口, 传入的音乐 hash, 可以获取对应的音乐的高潮时间
+
+**必选参数：**
+
+`hash`: 音乐 hash, 可以传多个，以逗号分割
+
+**接口地址：** `/song/climax`
+
+**调用例子：** `/song/climax?hash=xxx`
+
+### 搜索
+
+说明: 调用此接口 , 传入搜索关键词可以搜索该音乐 / mv / 歌单 / 歌词 / 专辑 / 歌手
+
+**必选参数：**
+
+`keywords`: 关键词
+
+**可选参数：**
+
+`page `: 页数
+
+`pagesize `: 每页页数, 默认为 30
+
+`type`: 搜索类型；默认为单曲，special：歌单，lyric：歌词，song：单曲，album：专辑，author：歌手，mv：mv
+
+⚠️ 注意：因接口问题，获取搜索结果需要在 url 后添加`cookie`认证信息或者`Set-cookie`，否则会返回 `error_code: 152`
+
+⚠️ 注意：建议请求在所有搜索接口时添加认证信息防止调用失败！
+
+**接口地址：** `/search`
+
+**调用例子：** `/search?keywords=海阔天空`（错误示例），`/search?keywords=周杰伦&cookie=token=xxxx;userid=xxxx;dfid=xxxx`（必须携带认证信息）
+
+### 默认搜索关键词
+
+说明 : 调用此接口 , 可获取默认搜索关键词
+
+**接口地址：** `/search/default`
+
+### 综合搜索
+
+说明: 调用此接口, 传入搜索关键词可以获得综合搜索，搜索结果同时包含单曲 , 歌手 , 歌单等信息
+
+**必选参数：**
+
+`keywords`: 关键词
+
+**可选参数：**
+
+`page `: 页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/search/complex`
+
+**调用例子：** `/search/complex?keywords=海阔天空`
+
+### 热搜列表
+
+说明 : 调用此接口,可获取热门搜索列表
+
+**接口地址：** `/search/hot`
+
+**调用例子：** `/search/hot`
+
+### 搜索建议
+
+说明 : 调用此接口 , 传入搜索关键词可获得搜索建议 , 搜索结果同时包含单曲 , 歌手 , 歌单信息
+
+**可选参数：**
+
+`albumTipCount `: 专辑返回数量
+
+`correctTipCount `: 目前未知，可能是歌单
+
+`mvTipCount `: MV 返回数量
+
+`musicTipCount `: 音乐返回数量
+
+**接口地址：** `/search/suggest`
+
+**调用例子：** `/search/suggest?keywords=海阔天空`
+
+### 歌词搜索
+
+说明: 调用此接口, 可以搜索歌词，该接口需配合 [`/lyric`](#获取歌词) 使用。
+
+**必选参数：**
+
+`keywords`: 关键词，与 hash 二选一
+
+`hash`: 歌曲 hash，与 keyword 二选一
+
+**可选参数：**
+
+`album_audio_id`: 专辑音乐 id,
+
+`duration`：歌曲时间
+
+`man`: 是否返回多个歌词，`yes`：返回多个， `no`：返回一个。 默认为`no`
+
+**接口地址：** `/search/lyric`
+
+**调用例子：** `/search/lyric?keywords=xxx` `/search/lyric?keywords=xxx&hash=xxx`
+
+### 获取歌词
+
+说明 : 调用此接口，可以获取歌词，调用该接口前则需要调用[`/search/lyric`](#歌词搜索) 获取完整参数
+
+**必选参数：**
+
+`id`: 歌词 id, 可以从 [`/search/lyric`](#歌词搜搜) 接口中获取
+
+`accesskey`: 歌词 accesskey, 可以从 [`/search/lyric`](#歌词搜搜) 接口中获取
+
+**可选参数：**
+
+`fmt`: 歌词类型，lrc 为普通歌词，krc 为逐字歌词
+
+`decode`: 是否解码，传入该参数这返回解码后的歌词
+
+**接口地址：** `/lyric`
+
+**调用例子：** `/lyric?id=xxx&accesskey=xxx` `/lyric?id=xxx&accesskey=xxx&fmt=lrc` `/lyric?id=xxx&accesskey=xxx&decode=true`
+
+### 歌单分类
+
+说明 : 调用此接口,可获取歌单分类,包含 category 信息
+
+**接口地址：** `/playlist/tags`
+
+**调用例子：** `/playlist/tags`
+
+### 歌单
+
+说明 : 调用此接口 , 可获取歌单
+
+**必选参数：**
+
+`category_id`: tag，0：推荐，11292：HI-RES，其他可以从 [`/playlist/tags`](#歌单分类) 接口中获取（接口下的 `tag_id` 为 `category_id`的值）
+
+**可选参数：**
+
+`withsong`: 是否返回歌曲列表（不全），0：不返回，1：返回
+
+`withtag`: 是否返回歌单分类，0：不返回，1：返回
+
+**接口地址：** `/top/playlist`
+
+**调用例子：** `/top/playlist?category_id=0`
+
+### 主题歌单
+
+说明 : 调用此接口 , 可获取主题歌单, 通过 [`/theme/playlist/track`](#获取主题歌单所有歌曲) 可以获取主题个单下的歌曲
+
+**接口地址：** `/theme/playlist`
+
+**调用例子：** `/theme/playlist`
+
+### 音效歌单
+
+说明 : 调用此接口 , 可获取音效歌单
+
+**可选参数：**
+
+`page `: 页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/playlist/effect`
+
+**调用例子：** `/playlist/effect`
+
+### 获取社区音效
+
+说明 : 调用此接口 , 可获取社区音效列表
+
+**可选参数：**
+
+`sort` : 排序方式, 不传默认为 2。实测取值含义: 3 为最热, 4 为最新
+
+`page` : 页数
+
+`pagesize` : 每页页数, 默认为 30
+
+**接口地址：** `/get/model`
+
+**调用例子：** `/get/model?sort=4`
+
+### 获取歌单详情
+
+说明: 调用此接口 , 可获取歌单详细信息
+
+**必选参数：**
+
+`ids`: 歌单中的 `global_collection_id`，可以传多个，用逗号分隔
+
+**接口地址：** `/playlist/detail`
+
+**调用例子：** `/playlist/detail?ids=collection_3_1863870844_4_0` `/playlist/detail?ids=collection_3_1863870844_4_0,collection_3_2093906551_8_0`
+
+### 获取歌单所有歌曲
+
+说明 : 调用此接口，传入对应的歌单 global_collection_id，即可获得对应的所有歌曲
+
+**必选参数：**
+
+`id`: 歌单中的 `global_collection_id`
+
+**可选参数：**
+
+`page `: 页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/playlist/track/all`
+
+**调用例子：** `/playlist/track/all?id=collection_3_1863870844_4_0`
+
+### 获取歌单所有歌曲(新版)
+
+说明 : 调用此接口，传入对应的歌单 listid，即可获得对应的所有歌曲, 目前该接口仅支持 用户所创建及收藏的歌单
+
+**必选参数：**
+
+`lisdid`: 歌单中的 `listid`
+
+**可选参数：**
+
+`page `: 页数
+
+`pagesize `: 每页页数, 默认为 30
+
+> 说明: 修改歌单内歌曲排序请调用 [`/playlist/tracks/sort`](#对歌单内歌曲排序)。
+
+**接口地址：** `/playlist/track/all/new`
+
+**调用例子：** `/playlist/track/all/new?listid=xxx`
+
+### 相似歌单
+
+说明 : 调用此接口，根据歌单 id 获取相似歌单
+
+**必选参数：**
+
+`ids`：歌单 global_collection_id，支持多个，每个以逗号分隔
+
+**接口地址：** `/playlist/similar`
+
+**调用例子：** `/playlist/similar?ids=collection_1_1341266283_964007_0`
+`/playlist/similar?ids=collection_1_1341266283_964007_0,collection_3_1041185112_11_0`
+
+### 获取主题歌单所有歌曲
+
+**必选参数：**
+
+`theme_id`: 主题歌单 id
+
+**接口地址：** `/theme/playlist/track`
+
+**调用例子：** `/theme/playlist/track?theme_id=18`
+
+### 获取主题音乐
+
+说明 : 调用此接口，可以获取主题音乐，调用 [`/theme/music/detail`](#) 可以获取主题音乐详情
+
+**接口地址：** `/theme/music`
+
+**调用例子：** `/theme/music`
+
+### 获取主题音乐详情
+
+说明 : 调用此接口，传入对应的主题 id 可以获取主题音乐详情.
+
+**必选参数：**
+
+`id`: 主题音乐 id
+
+**接口地址：** `/theme/music/detail`
+
+**调用例子：** `/theme/music/detail?id=1002`
+
+### 歌曲推荐
+
+说明 : 调用此接口，可以获取歌曲推荐.
+
+**必选参数：**
+
+`card_id`: 1：对应安卓 精选好歌随心听 || 私人专属好歌，2：对应安卓 经典怀旧金曲，3：对应安卓 热门好歌精选，4：对应安卓 小众宝藏佳作，5：未知，6：对应
+vip 专属推荐
+
+**接口地址：** `/top/card`
+
+**调用例子：** `/top/card?card_id=1`
+
+### 歌曲推荐（概念版）
+
+说明 : 调用此接口，可以获取歌曲推荐
+
+**必选参数：**
+
+`card_id`: 3006: VIP 专属推荐，3001: 私人专属好歌，3004: 小众宝藏佳作，3014: 喜欢这首歌的 TA 也喜欢，3101: 概念 er 新推，3005: 潮流尝鲜
+
+**可选参数**
+
+`pagesize`: 每页页数, 默认为 30
+
+**接口地址：** `/top/card`
+
+**调用例子：** `/top/card/youth?card_id=3006`
+
+### 获取歌手和专辑图片
+
+说明 : 调用此接口，可以获取歌手和专辑图片.
+
+**必选参数：**
+
+`hash`: 歌曲 hash, 可以传多个，每个以逗号分开
+
+**可选参数：**
+
+`album_id`: 专辑 id, 可以传多个，每个以逗号分开
+
+`album_audio_id`: 专辑音乐 id, 可以传多个，每个以逗号分开
+
+`count`: 最多返回多少张图片，默认为 5
+
+**接口地址：** `/images`
+
+**调用例子：** `/images?hash=B04ED0F01ABBB62B9D22EC4616ED8AFE`
+`/image?hash=B04ED0F01ABBB62B9D22EC4616ED8AFE,55603312694BF99AD6000C2D0D72D368&album_id=,75013431`
+
+### 获取歌手图片
+
+说明 : 调用此接口，可以获取歌手图片.
+
+**必选参数：**
+
+`hash`: 歌曲 hash, 可以传多个，每个以逗号分开
+
+**可选参数：**
+
+`audio_id`: 音乐 id, 可以传多个，每个以逗号分开
+
+`album_audio_id`: 专辑音乐 id, 可以传多个，每个以逗号分开
+
+`filename`: 音乐文件名称, 可以传多个，每个以逗号分开
+
+`count`: 最多返回多少张图片，默认为 5
+
+**接口地址：** `/images/audio`
+
+**调用例子：** `/images/audio?hash=B04ED0F01ABBB62B9D22EC4616ED8AFE`
+`/image/audio?hash=B04ED0F01ABBB62B9D22EC4616ED8AFE,55603312694BF99AD6000C2D0D72D368`
+
+### 获取音乐相关信息
+
+说明：调用此接口，可以获取音乐相关信息
+
+**必选参数：**
+
+`hash`: 歌曲 hash, 可以传多个，每个以逗号分开
+
+**接口地址：** `/audio`
+
+**调用例子：** `/audio?hash=B04ED0F01ABBB62B9D22EC4616ED8AFE` `/audio?hash=B04ED0F01ABBB62B9D22EC4616ED8AFE,55603312694BF99AD6000C2D0D72D368`
+
+### 获取更多音乐版本
+
+说明：调用此接口，可以获取更多版本音乐
+
+**必选参数：**
+
+`album_audio_id`：音乐的 mixsongid/album_audio_id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+`show_type`：是否返回分类
+
+`sort`：排序，支持 `all`，`hot`，`new`
+
+`type`: 分类
+
+`show_detail`：是否返回详情，否则只返回总数，0：只返回总数，不传或者其他都返回详情
+
+**接口地址：** `/audio/related`
+
+**调用例子：** `/audio/related?album_audio_id=573120919` `/audio/related?album_audio_id=573120919&show_detail=0`
+
+### 获取音乐伴奏信息
+
+说明：调用此接口，可以获取最佳伴奏信息
+
+**必选参数：**
+
+`hash`：音乐 hash
+
+`fileName`: 音乐 fileName
+
+`mixid`: 音乐的 mixsongid/album_audio_id
+
+**接口地址：** `/audio/accompany/matching`
+
+**调用例子：** `/audio/accompany/matching?fileName=希林娜依高 - Shine Brighter (愈加璀璨)&mixId=637735200&hash=6D431B0507587447B3D7345434DC5825`
+
+### 获取音乐 K 歌数量
+
+说明：调用此接口，可以获取音乐 K 歌数量，**参数信息均来自[获取音乐伴奏信息](#获取音乐伴奏信息)**
+
+**必选参数：**
+
+`songId`：音乐 songid, 该字段需要请求 [获取音乐伴奏信息](#获取音乐伴奏信息) 获取
+
+`singerName`：歌手名称，多个以 `、` 隔开，也可以到 [获取音乐伴奏信息](#获取音乐伴奏信息) 中获取
+
+`songHash`：音乐 hash, 该字段需要请求 [获取音乐伴奏信息](#获取音乐伴奏信息) 获取
+
+**接口地址：** `/audio/ktv/total`
+
+**调用例子：** `/audio/ktv/total?songId=43522508&singerName=希林娜依高&songHash=99AE5A7B04FF76550E380C3757D3E273`
+
+### 获取音乐详情
+
+说明：调用此接口，可以获取音乐详情
+
+**必选参数：**
+
+`hash`: 歌曲 hash, 可以传多个，每个以逗号分开
+
+**接口地址：** `/privilege/lite`
+
+**调用例子：** `/privilege/lite?hash=B04ED0F01ABBB62B9D22EC4616ED8AFE`
+`/privilege/lite?hash=B04ED0F01ABBB62B9D22EC4616ED8AFE,55603312694BF99AD6000C2D0D72D368`
+
+### 获取音乐专辑/歌手信息
+
+说明：调用此接口，可以获取音乐专辑/歌手信息
+
+**必选参数：**
+
+`album_audio_id`: 专辑音乐 id (album_audio_id/MixSongID 均可以), 可以传多个，每个以逗号分开
+
+**可选参数**
+
+`fields`: 可以传 `album_info` `authors.base` `base` `audio_info`, `authors.ip`, `extra`, `tags`, `tagmap` 每个 field 以逗号分开
+
+**接口地址：** `/krm/audio`
+
+**调用例子：** `/krm/audio?album_audio_id=32155307` `/krm/audio?album_audio_id=32155307&fields=album_info,base,authors.base`
+
+### 私人 FM(对应手机和 pc 端的猜你喜欢)
+
+说明 : 私人 FM
+
+**可选参数：**
+
+`hash`: 音乐 hash, 建议
+
+`songid`: 音乐 songid, 建议
+
+`playtime`: 已播放时间, 建议
+
+`mode`: 获取模式，默认为 normal, normal：发现(红心 Radio)，small： 小众，peak：30s，radio：电台
+
+`action`: 默认为 play, login：登录/首次拉取, garbage：不喜欢, cancel_garbage：取消不喜欢, click_red：红心, cancel_red：取消红心, download：下载, black_singer：屏蔽歌手, cancel_black_singer：取消屏蔽, update_recommend_source：更新推荐来源, change_song_pool：切换推荐池
+
+`cur_mark`: 当前推荐标记，click_red / cancel_red 等操作建议传入
+
+`song_pool_id`： 手机版的 AI，0：Alpha 根据口味推荐相似歌曲, 1：Beta 根据风格推荐相似歌曲, 2：Gamma
+
+`is_overplay`: 是否已播放完成
+
+`remain_songcnt`: 剩余未播放歌曲数, 默认为 0，大于 4 不返回推荐歌曲，建议
+
+**接口地址：** `/personal/fm`
+
+**调用例子：** `/personal/fm`
+
+### banner
+
+说明 : 调用此接口 , 可获取 banner( 轮播图 ) 数据
+
+**接口地址：** `/pc/diantai`
+
+**调用例子：** `/pc/diantai`
+
+### 乐库 banner
+
+说明 : 调用此接口 , 可获取 乐库 banner( 轮播图 ) 数据
+
+**接口地址：** `/yueku/banner`
+
+**调用例子：** `/yueku/banner`
+
+### 乐库电台
+
+说明 : 调用此接口 , 可获取乐库电台数据
+
+**接口地址：** `/yueku/fm`
+
+**调用例子：** `/yueku/fm`
+
+### 乐库
+
+说明 : 调用此接口 , 可获取手机端乐库数据
+
+**接口地址：** `/yueku`
+
+**调用例子：** `/yueku`
+
+### 电台
+
+说明 : 调用此接口 , 可获取所有电台数据
+
+**接口地址：** `/fm/class`
+
+**调用例子：** `/fm/class`
+
+### 电台 - 推荐
+
+说明 : 调用此接口 , 可获取推荐电台
+
+**接口地址：** `/fm/recommend`
+
+**调用例子：** `/fm/recommend`
+
+### 电台 - 图片
+
+说明 : 调用此接口 , 可获取对应电台的图片
+
+**必选参数：**
+
+`fmid`: fmid，可以传多个，以逗号分割
+
+**接口地址：** `/fm/image`
+
+**调用例子：** `/fm/image?fmid=693` `/fm/image?fmid=693,37`
+
+### 电台 - 音乐列表
+
+说明 : 调用此接口 , 可获取对应电台的音乐列表
+
+**必选参数：**
+
+`fmid`: fmid，可以传多个，以逗号分割
+
+**可选参数：**
+
+`fmtype`: fmtype, 可以传多个，以逗号分割
+
+`fmoffset`: 歌曲偏移，可以传多个，以逗号分割
+
+`fmsize`: 歌曲列表大小，可以传多个，以逗号分割
+
+**接口地址：** `/fm/songs`
+
+**调用例子：** `/fm/image?fmid=693` `/fm/image?fmid=693,37&fmtype=2,2&fmoffset=,5&fmsize5,3`
+
+### 编辑精选
+
+说明 : 调用此接口 , 可获取编辑精选数据
+
+**接口地址：** `/top/ip`
+
+**调用例子：** `/top/ip`
+
+### 编辑精选数据
+
+说明 : 调用此接口 , 可获取编辑对应数据
+
+**必选参数：**
+
+`id`: ip id
+
+**可选参数：**
+
+`type`: 数据类型，audios: 音乐, albums: 专辑, videos: 视频, author_list: 歌手
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+**接口地址：** `/ip`
+
+**调用例子：** `/ip?id=87473` `ip?id=87473&type=author_list`
+
+### 编辑精选歌单
+
+说明：调用此接口，可获取编辑精选歌单数据
+
+**必选参数：**
+
+`id`: ip id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+**接口地址：** `/ip/playlist`
+
+**调用例子：** `/ip/playlist?id=87473`
+
+### 编辑精选专区
+
+说明：调用此接口，可获取编辑精选专区相关内容，若数据中没有 ip_id，可使用[`/ip/zone/home`](#编辑精选专区详情)来获取数据
+
+**接口地址：** `/ip/zone`
+
+**调用例子：** `/ip/zone`
+
+### 编辑精选专区详情
+
+说明：调用此接口，可获取编辑精选专区详情，若[`/ip/zone`](#编辑精选专区) 数据中没有 ip_id，可使用该接口获取数据
+
+**必选参数：**
+
+`id`: ip id
+
+**接口地址：** `/ip/zone/home`
+
+**调用例子：** `/ip/zone/home?id=329`
+
+### 领取 VIP（需要登陆，该接口为测试接口,仅限概念版使用，该接口目前不可使用）
+
+说明 : 调用此接口 , 每天可领取 1 天 VIP 时长，需要领取 8 次，每次增加 3 小时，该接口来自 KG 概念版，非会员用户需要自行测试是否可用(尽量别频繁调用)
+
+**接口地址：** `/youth/vip`
+
+**调用例子：** `/youth/vip`
+
+### 领取一天 VIP（需要登陆，该接口为测试接口,仅限概念版使用）
+
+说明 : 调用此接口 , 领取概念版 VIP，传入日期可领取改日期一天 VIP，该接口来自 KG 概念版，非会员用户需要自行测试是否可用(尽量别频繁调用)
+
+注意 ⚠️：建议不要领太多天
+
+**必选参数：**
+
+`receive_day`: 领取 VIP 日期，格式为：2026-01-30
+
+**接口地址：** `/youth/day/vip`
+
+**调用例子：** `/youth/day/vip`
+
+### 升级概念版 VIP（需要登录，需要先领取一天 VIP，该接口为测试接口,仅限概念版使用）
+
+说明 : 调用此接口 , 可以升级成畅听 VIP，该接口需要先领取一天 VIP（`/youth/day/vip`），该接口来自 KG 概念版，非会员用户需要自行测试是否可用(尽量别频繁
+调用)
+
+**接口地址：** `/youth/day/vip/upgrade`
+
+**调用例子：** `/youth/day/vip/upgrade`
+
+### 获取当月已领取 VIP 天数（需要登陆，该接口为测试接口,仅限概念版使用）
+
+说明 : 调用此接口 ,获取当月已领取 VIP 天数
+
+**接口地址：** `/youth/month/vip/record`
+
+**调用例子：** `/youth/month/vip/record`
+
+### 获取已领取 VIP 状态（需要登陆，该接口为测试接口,仅限概念版使用）
+
+说明 : 调用此接口 ,获取已领取 VIP 状态
+
+**接口地址：** `/youth/union/vip`
+
+**调用例子：** `/youth/union/vip`
+
+### 获取歌手列表
+
+说明 : 调用此接口，可以获取歌手列表.
+
+**可选参数：**
+
+`sextypes`：性别类型，0：全部，1：男，2：女，3：组合
+
+`type`：类型，0：全部，1：华语，2：欧美，3：日韩，4：其他，5：日本，6：韩国
+
+`musician`：音乐人，3：为音乐人,0：默认
+
+`hotsize`：返回热门数量，默认 30
+
+**接口地址：** `/artist/lists`
+
+**调用例子：** `/artist/lists`
+
+### 获取歌手详情
+
+说明 : 调用此接口 , 传入歌手 id, 可获得歌手信息
+
+**必选参数：**
+
+`id`： 歌手 id
+
+**接口地址：** `/artist/detail`
+
+**调用例子：** `/artist/detail?id=6539`
+
+### 获取歌手专辑
+
+说明 : 调用此接口 , 传入歌手 id, 可获得歌手专辑
+
+**必选参数：**
+
+`id`： 歌手 id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+`sort`: 排序，hot : 热门, new: 最新
+
+**接口地址：** `/artist/albums`
+
+**调用例子：** `/artist/albums?id=6539`
+
+### 获取歌手单曲
+
+说明 : 调用此接口 , 传入歌手 id, 可获得歌手歌曲
+
+**必选参数：**
+
+`id`： 歌手 id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+`sort`: 排序，hot : 热门, new: 最新
+
+**接口地址：** `/artist/audios`
+
+**调用例子：** `/artist/audios?id=6539`
+
+### 获取歌手 MV
+
+说明 : 调用此接口 , 传入歌手 id, 可获得歌手 MV
+
+**必选参数：**
+
+`id`： 歌手 id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+`tag`: official: 官方版本，live：现场版本，fan：饭制版本，artist: 歌手发布, all: 获取全部，默认为获取全部
+
+**接口地址：** `/artist/videos`
+
+**调用例子：** `/artist/videos?id=6539`
+
+### 关注歌手
+
+说明：调用此接口, 传入歌手 id, 可以关注该歌手（需要登录）
+
+**必选参数：**
+
+`id`: 歌手 id
+
+**接口地址：** `/artist/follow`
+
+**调用例子：** `/artist/follow?id=6539`
+
+### 取消关注歌手
+
+说明：调用此接口, 传入歌手 id, 可以取消关注该歌手（需要登录）
+
+**必选参数：**
+
+`id`: 歌手 id
+
+**接口地址：** `/artist/unfollow`
+
+**调用例子：** `/artist/unfollow?id=6539`
+
+### 获取关注歌手新歌
+
+说明：调用此接口, 可以获取用户已关注的歌手新歌（需要登录）
+
+**可选参数：**
+
+`last_album_id`: 最后专辑 id
+
+`pagesize`: 每页页数, 默认为 30,
+
+`opt_sort`: 排序，1：时间，2：亲密度，默认为 1(时间)
+
+**接口地址：** `/artist/follow/newsongs`
+
+**调用例子：** `/artist/follow/newsongs`
+
+### 获取视频 url
+
+说明 : 传入的视频的 hash, 可以获取对应的视频的 url
+
+**必选参数：**
+
+`hash`: 视频 hash
+
+**接口地址：** `/video/url`
+
+**调用例子：** `/video/url?hash=3B5EE16299F703AEB0E5C28CB152EDF0`
+
+### 获取歌曲 MV
+
+说明 : 传入 album_audio_id/MixSongID 获取歌曲 相对应的 mv
+
+**必选参数：**
+
+album_audio_id: 专辑音乐 id (album_audio_id/MixSongID 均可以), 可以传多个，每个以逗号分开,
+
+**可选参数：**
+
+fields: 支持多个，每个以逗号分隔，支持的值有：mkv,tags,h264,h265,authors
+
+**接口地址：** `/kmr/audio/mv`
+
+**调用例子：** `/kmr/audio/mv?album_audio_id=32155307` `/kmr/audio/mv?album_audio_id=32155307&fields=mkv,tags`
+
+### 获取视频相关信息
+
+说明 : 传入的视频的 hash, 可以获取对应的视频的相关信息
+
+**必选参数：**
+
+`hash`: 视频 hash，可以传多个，以逗号隔开
+
+**接口地址：** `/video/privilege`
+
+**调用例子：** `/video/privilege?hash=3B5EE16299F703AEB0E5C28CB152EDF0`
+
+### 获取视频详情
+
+说明：调用此接口，可以获取视频详情，可以获取更高清的视频 hash
+
+**必选参数：**
+
+`id`: 视频 id/video id
+
+**接口地址：** `/video/detail`
+
+**调用例子：** `/video/detail?id=11517822`
+
+### 新歌速递
+
+说明：调用此接口，可以获取新歌速递
+
+**接口地址：** `/top/song`
+
+**调用例子：** `/top/song`
+
+### 场景音乐列表
+
+说明：调用此接口，可以场景音乐列表
+
+**接口地址：** `/scene/lists`
+
+**调用例子：** `/scene/lists`
+
+### 场景音乐详情
+
+说明：调用此接口，可以场景音乐详情
+
+**必选参数：**
+
+`id`: 场景音乐 scene_id
+
+**接口地址：** `/scene/module`
+
+**调用例子：** `/scene/module?id=9`
+
+### 获取场景音乐讨论区
+
+说明：调用此接口，可以获取场景音乐讨论区
+
+**必选参数**
+
+`id`: 场景音乐 scene_id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+`sort`: 排序，rec: 推荐，hot: 热门，new: 最新, 默认为推荐
+
+**接口地址：** `/scene/list/v2`
+
+**调用例子：** `/scene/list/?id=9`
+
+### 获取场景音乐模块 Tag
+
+说明：调用此接口，可以获取场景模块 Tag
+
+**必选参数**
+
+`id`: 场景音乐 scene_id
+
+`module_id`: 场景音乐 module_id
+
+**可选参数：**
+
+**接口地址：** `/scene/module/info`
+
+**调用例子：** `/scene/module/info?id=9&module_id=83`
+
+### 获取场景音乐歌单列表
+
+说明：调用此接口，可以获取场景音乐歌单列表
+
+**必选参数**
+
+`tag_id`: 场景音乐 tag_id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+**接口地址：** `/scene/collection/list`
+
+**调用例子：** `/scene/collection/list?tag_id=42391`
+
+### 获取场景音乐视频列表
+
+说明：调用此接口，可以获取场景音乐视频列表
+
+**必选参数**
+
+`tag_id`: 场景音乐视频 tag_id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+**接口地址：** `/scene/video/list`
+
+**调用例子：** `/scene/video/list?tag_id=42399`
+
+### 获取场景音乐音乐列表
+
+说明：调用此接口，可以获取场景音乐音乐列表
+
+**必选参数**
+
+`id`: 场景音乐 scene_id
+
+`module_id`: 场景音乐 module_id
+
+`tag`: 场景音乐 tag_id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+**接口地址：** `/scene/audio/list`
+
+**调用例子：** `/scene/audio/list?id=9&module_id=173&tag=42391`
+
+### 每日推荐
+
+说明：调用此接口，可以获取每日推荐列表
+
+**可选参数：**
+
+`platform`：设备类型，默认为 ios,支持 android 和 ios
+
+**接口地址：** `/everyday/recommend`
+
+**调用例子：** `/everyday/recommend`
+
+### 历史推荐
+
+说明：调用此接口，可以获取历史推荐
+
+**可选参数：**
+
+`mode`：当 mode 为 list 时，则返回历史推荐列表，当 mode 为 song 时则返回当前歌曲列表，支持参数为：list 和 song,
+
+`history_name`: 当 mode 为 song 该参数为必选参数。
+
+`date`: 当 mode 为 song 该参数为必选参数。
+
+`platform`：设备类型，默认为 ios,支持 android 和 ios
+
+**接口地址：** `/everyday/history`
+
+**调用例子：** `/everyday/history` `/everyday/history?mode=song&history_name=RT_336d5ebc5436534e61d16e63ddfca327_20240106&date=20240106`
+
+### 风格推荐
+
+说明：调用此接口，可以获取风格推荐
+
+**可选参数：**
+
+`platform`：设备类型，默认为 ios,支持 android 和 ios
+
+`tagids`：支持多个，每个以逗号分隔，该接口下可获取 tag 信息
+
+**接口地址：** `/everyday/style/recommend`
+
+**调用例子：** `/everyday/style/recommend` `/everyday/style/recommend?tagids=S14,S15,S16`
+
+### 首页刷歌推荐
+
+说明：调用此接口，可以获取首页"刷歌"（发现页沉浸式）推荐歌曲列表
+
+**可选参数：**
+
+`pagesize`：每次返回的推荐歌曲数量，默认为 4
+
+`today_play_num`：今日已播放歌曲数，影响推荐去重与排序，默认为 0
+
+`recall_type`：召回类型，默认为 song
+
+**接口地址：** `/home/discover`
+
+**调用例子：** `/home/discover` `/home/discover?pagesize=10`
+
+### 排行列表
+
+说明：调用此接口，可以获取排行榜列表
+
+**可选参数：**
+
+`withsong`：是否返回歌曲（部分）
+
+**接口地址：** `/rank/list`
+
+**调用例子：** `/rank/list`
+
+### 排行榜推荐列表
+
+说明：调用此接口，可以获取排行榜推荐列表
+
+**接口地址：** `/rank/top`
+
+**调用例子：** `/rank/top`
+
+### 排行榜往期列表
+
+说明：调用此接口，可以获取排行榜往期列表
+
+**必选参数：**
+
+`rankid`：排行榜 id
+
+**可选参数：**
+
+`rank_cid`：排行榜 cid
+
+**接口地址：** `/rank/vol`
+
+**调用例子：** `/rank/vol?rankid=8888`
+
+### 排行榜信息
+
+说明：调用此接口，可以获取排行榜信息
+
+**必选参数：**
+
+`rankid`：排行榜 id
+
+**可选参数：**
+
+`rank_cid`：排行榜 cid
+
+`album_img`：是否返回专辑图片，1：返回，0：不返回，默认返回
+
+`zone`：排行榜 zone
+
+**接口地址：** `/rank/info`
+
+**调用例子：** `/rank/info?rankid=8888`
+
+### 排行榜歌曲列表
+
+说明：调用此接口，可以获排行榜歌曲列表
+
+**必选参数：**
+
+`rankid`：排行榜 id
+
+**可选参数：**
+
+`rank_cid`：若需要返回往期歌曲列表，则该参数为必填，否则默认返回最新一期，[`/rank/vol`](#排行榜往期列表) 返回值中，`volid` 则为该参数
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+**接口地址：** `/rank/audio`
+
+**调用例子：** `/rank/audio?rankid=8888` `/rank/audio?rankid=8888&rank_cid=76442`
+
+### 歌曲收藏数
+
+说明 : 调用此接口 , 传入音乐 mixsongids 参数 , 可获得该音乐的收藏数( 不需要登录 )
+
+**必选参数：**
+
+`mixsongids`：音乐 mixsongid，多个以逗号分隔
+
+**接口地址：** `/favorite/count`
+
+**调用例子：** `/favorite/count?mixsongids=368015985,368015986` `/favorite/count?mixsongids=368015985`
+
+### 歌曲评论数
+
+说明 : 调用此接口 , 传入音乐 hash/special_id 参数 , 可获得该音乐的评论数( 不需要登录 )
+
+**必选参数：**
+
+`hash`：音乐 hash
+
+`special_id`：为 评论下的 special_child_id 字段
+
+**接口地址：** `/comment/count`
+
+**调用例子：** `/comment/count?hash=98eb07ad8eaf74bf56dece55518ad63e` `/comment/count?special_id=20505418`
+
+### 歌曲评论
+
+说明 : 调用此接口 , 传入音乐 mixsongid 参数 , 可获得该音乐的所有评论 ( 不需要登录 )
+
+**必选参数：**
+
+`mixsongid`：音乐 mixsongid
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+`show_classify`： 是否返回分类列表，0 为不返回，1 为返回
+
+`show_hotword_list`：是否返回热词，0 为不返回，1 为返回
+
+`ver`：评论列表版本号，默认取环境变量 `CMT_VER`，未设置时为 `6`
+
+**接口地址：** `/comment/music`
+
+**调用例子：** `/comment/music?mixsongid=302362878`
+
+### 发送歌曲评论
+
+说明：向普通歌曲评论池发送顶层评论，需要登录。该接口使用 `fc4be23b4e972707f36b8a828a93ba8a` 评论池，与 `/song/barrage/send` 的歌曲弹幕池不同。仅传 `mixsongid` 时会先调用歌曲评论查询接口，自动解析 `special_id` 和歌曲名称。
+
+**必选参数：**
+
+`content`：评论文本
+
+`mixsongid` / `special_id`：至少传入一个。推荐传 `mixsongid`；直接传 `special_id` 时可同时传 `name`
+
+**可选参数：**
+
+`name`：歌曲显示名称
+
+**接口地址：** `/comment/music/send`
+
+**调用例子：**
+
+```bash
+curl -X POST http://127.0.0.1:3000/comment/music/send \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","mixsongid":"302362878","content":"评论内容"}'
+```
+
+> 发布评论可能触发手机号验证、内容审核或账号风控。成功请求会产生真实公开内容，请勿自动重试。
+
+### 歌曲评论-根据分类返回
+
+说明 : 调用此接口 , 传入音乐 mixsongid 和 type_id 参数 , 可获得该音乐的分类评论 ( 不需要登录 )
+
+**必选参数：**
+
+`mixsongid`：音乐 mixsongid
+
+`type_id`：分类 id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+`sort`：排序，1 为正序，2 为倒序
+
+**接口地址：** `/comment/music/classify`
+
+**调用例子：** `/comment/music/classify?mixsongid=302362878&type_id=12`
+
+### 歌曲评论-根据热词返回
+
+说明 : 调用此接口 , 传入音乐 mixsongid 和 hot_word 参数 , 可获得该音乐的热词评论 ( 不需要登录 )
+
+**必选参数：**
+
+`mixsongid`：音乐 mixsongid
+
+`hot_word`：热词
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+**接口地址：** `/comment/music/hotword`
+
+**调用例子：** `/comment/music/hotword?mixsongid=302362878&hot_word=生活`
+
+### 楼层评论
+
+说明 : 调用此接口 , 传入资源 special_id 和资源类型 tid 和资源 mixsongid 参数, 可获得该资源的歌曲楼层评论
+
+**必选参数：**
+
+`special_id`：为 评论下的 special_child_id 字段
+
+`mixsongid`：为 歌曲的 mixsongid
+
+`tid`：评论 id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+**接口地址：** `/comment/floor`
+
+**调用例子：** `/comment/floor?special_id=100285259&mixsongid=302362878&tid=678433417`
+
+### 发送楼层评论
+
+说明：在歌曲、专辑或歌单的评论楼层中发送回复，需要登录。底层使用 `commentsv2/reply`，不是发送顶层评论的 `commentsv3/add`。
+
+**必选参数：**
+
+`special_id`：评论资源 `special_child_id`
+
+`tid`：楼层所属的顶层评论 ID
+
+`content`：回复文本
+
+**可选参数：**
+
+`resource_type`：资源类型，可选 `song`、`album`、`playlist`，默认 `song`
+
+`code`：直接指定评论池 code，优先级高于 `resource_type`
+
+`pid`：直接回复目标的评论 ID；回复顶层评论时不传或传 `0`
+
+`is_t`：是否直接回复顶层评论。不传时，`pid=0` 自动取 `1`，否则取 `0`
+
+`mixsongid`：歌曲 mixsongid，用于歌曲楼层查询和名称解析
+
+`name`：资源名称；不传时会先调用 `/comment/floor` 尝试解析
+
+`reply_user_name`、`reply_content`：被回复用户和原评论内容；两者都提供时，会按客户端格式拼接为 `回复内容//@用户名:原评论`
+
+**接口地址：** `/comment/floor/send`
+
+**调用例子：**
+
+```bash
+curl -X POST http://127.0.0.1:3000/comment/floor/send \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","special_id":"100285259","mixsongid":"302362878","tid":"678433417","content":"回复内容"}'
+```
+
+> 发布楼层回复可能触发手机号验证、内容审核或账号风控。发送接口不会自动重试。
+
+### 删除评论
+
+说明：删除自己在歌曲、专辑或歌单评论池中的评论，需要登录。仅传 `mixsongid` 时会先调用歌曲评论查询接口，自动解析 `special_id`。
+
+**必选参数：**
+
+`cid`：要删除的评论 ID（列表返回的评论 `id` 字段）
+
+`mixsongid` / `special_id`：至少传入一个。推荐传 `mixsongid`，自动反查最可靠；直接传 `special_id` 时必须取评论列表返回的 `special_child_id`（如 `148401`），**不要**用发送评论响应里的 `special_id`
+
+**可选参数：**
+
+`tid`：楼层所属的顶层评论 ID；删除楼层回复（楼中楼）时必传
+
+`resource_type`：资源类型，可选 `song`、`album`、`playlist`，默认 `song`
+
+`code`：直接指定评论池 code，优先级高于 `resource_type`
+
+**接口地址：** `/comment/music/del`
+
+**调用例子：**
+
+```bash
+curl -X POST http://127.0.0.1:3000/comment/music/del \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","mixsongid":"302362878","cid":"123"}'
+```
+
+### 歌单评论
+
+说明 : 调用此接口 , 传入歌单 id 参数 , 可获得该歌单的所有评论 ( 不需要登录 )
+
+**必选参数：**
+
+`id`：歌单 global_collection_id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+`show_classify`： 是否返回分类列表，0 为不返回，1 为返回
+
+`show_hotword_list`：是否返回热词，0 为不返回，1 为返回
+
+**接口地址：** `/comment/playlist`
+
+**调用例子：** `/comment/playlist?id=collection_3_1373407643_366_0`
+
+### 发送歌单评论
+
+说明：向歌单评论池发送顶层评论，需要登录。未传 `name` 时会先调用歌单评论查询接口尝试解析歌单名称。
+
+**必选参数：**
+
+`id`：歌单 `global_collection_id`
+
+`content`：评论文本
+
+**可选参数：**
+
+`name`：歌单名称；目标歌单没有历史评论、无法自动解析名称时建议显式传入
+
+**接口地址：** `/comment/playlist/send`
+
+**调用例子：**
+
+```bash
+curl -X POST http://127.0.0.1:3000/comment/playlist/send \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","id":"collection_3_1373407643_366_0","name":"歌单名称","content":"评论内容"}'
+```
+
+### 专辑评论
+
+说明 : 调用此接口 , 传入 专辑 id 参数 , 可获得该专辑的所有评论 ( 不需要登录 )
+
+`id`：专辑 id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30
+
+`show_classify`： 是否返回分类列表，0 为不返回，1 为返回
+
+`show_hotword_list`：是否返回热词，0 为不返回，1 为返回
+
+**接口地址：** `/comment/album`
+
+**调用例子：** `/comment/album?id=10729818`
+
+### 发送专辑评论
+
+说明：向专辑评论池发送顶层评论，需要登录。未传 `name` 时会先调用专辑评论查询接口尝试解析专辑名称。
+
+**必选参数：**
+
+`id`：专辑 ID
+
+`content`：评论文本
+
+**可选参数：**
+
+`name`：专辑名称；目标专辑没有历史评论、无法自动解析名称时建议显式传入
+
+**接口地址：** `/comment/album/send`
+
+**调用例子：**
+
+```bash
+curl -X POST http://127.0.0.1:3000/comment/album/send \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","id":"10729818","name":"小心思","content":"评论内容"}'
+```
+
+> 歌单和专辑评论同样可能进入审核。发送接口不会自动重试。
+
+### 提交听歌历史
+
+说明：提交听歌历史后，支持在其他设备上查看听歌历史
+
+**必选参数：**
+
+`mxid`： 专辑音乐 id (album_audio_id/MixSongID 均可以)
+
+**可选参数：**
+
+`ot`：当前时间戳, 秒级，不要传入毫秒级，否者会返回错误，或者从 [`获取服务器时间`](#获取服务器时间) 中获取
+
+`pc`: 当前播放次数，更新播放次数，当服务器的值大于传入值时，将维持服务最大值，否则更新
+
+**接口地址：** `/playhistory/upload`
+
+**调用例子：** `/playhistory/upload?mxid=32155307`
+
+### 获取服务器时间
+
+说明：获取服务器时间，返回服务器时间戳
+
+**接口地址：** `/server/now`
+
+**调用例子：** `/server/now`
+
+### 刷刷
+
+说明：获取刷刷视频
+
+**接口地址：** `/brush`
+
+**调用例子：** `/brush`
+
+### AI 推荐
+
+说明：传入 album_audio_id/MixSongID 获取 AI 推荐歌曲
+
+**必选参数：**
+
+`album_audio_id`： 专辑音乐 id (album_audio_id/MixSongID 均可以), 可以传多个，每个以逗号分开,
+
+**接口地址：** `/ai/recommend`
+
+**调用例子：** `/ai/recommend?album_audio_id=274565080` `/ai/recommend?album_audio_id=274565080,68435124`
+
+### 曲谱 - 获取歌曲曲谱
+
+说明 : 调用此接口，传入歌曲 album_audio_id/MixSongID 可获得该歌曲的曲谱，注意：需要自己解析，别问我，我也看不懂
+
+**必选参数：**
+
+`album_audio_id`：音乐的 mixsongid/album_audio_id
+
+**可选参数：**
+
+`instruments`：曲谱类型 默认为 1，1：吉他， 2：尤克里里，3：钢琴，4：简谱
+
+`level`： 等级/难度 默认为 0， 吉他（1: 进阶, 2：基础，0：中级），尤克里里/钢琴（0：基础，1：进阶）,简谱（0：基础）
+
+**接口地址：** `/sheet/song`
+
+**调用例子：** `/sheet/song?album_audio_id=68435136`
+
+### 曲谱 - 曲谱详情
+
+说明 : 调用此接口，传入曲谱 opern_id 可获得该曲谱详情，**注意：需要自己解析，别问我，我也看不懂**
+
+**必选参数：**
+
+`opern_id`：曲谱 id,
+
+**接口地址：** `/sheet/detail`
+
+**调用例子：** `/sheet/detail?id=68435136_1_0`
+
+### 曲谱 - 曲谱排行榜
+
+说明 : 调用此接口，可以获取推荐排行榜
+
+**可选参数：**
+
+`instruments`：曲谱类型 默认为 1，1：吉他， 2：尤克里里，3：钢琴，4：简谱
+
+`level`： 等级/难度 默认为 0， 吉他（1: 进阶, 2：基础，0：中级），尤克里里/钢琴（0：基础，1：进阶）,简谱（0：基础）
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/sheet/rank`
+
+**调用例子：** `/sheet/rank`
+
+### 曲谱 - 曲谱广场
+
+说明 : 调用此接口，可以获取推荐曲谱
+
+**可选参数：**
+
+`instruments`：曲谱类型 默认为 1，1：吉他， 2：尤克里里，3：钢琴，4：简谱
+
+`level`： 等级/难度 默认为 0， 吉他（1: 进阶, 2：基础，0：中级），尤克里里/钢琴（0：基础，1：进阶）,简谱（0：基础）
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+`tagid`: 标签, 通过 `/sheet/tags` 获取
+
+**接口地址：** `/sheet/explore`
+
+**调用例子：** `/sheet/explore`
+
+### 曲谱 - 曲谱标签
+
+说明 : 调用此接口，可以获取曲谱标签
+
+**接口地址：** `/sheet/tags`
+
+**调用例子：** `/sheet/tags`
+
+### 频道 - 获取用户所有频道
+
+说明：登录后调用此接口，可以获取用户所有订阅的频道
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/youth/channel/all`
+
+**调用例子：** `/youth/channel/all`
+
+### 频道 - 详情
+
+说明：调用此接口，传入 `global_collection_id / channel_id` 可以获取频道详情
+
+**必选参数：**
+
+`global_collection_id`：频道 id (global_collection_id / channel_id 均可以), 可以传多个，每个以逗号分开,
+
+**接口地址：** `/youth/channel/detail`
+
+**调用例子：** `/youth/channel/detail?global_collection_id=11576464149`
+
+### 频道 - 频道安利
+
+说明：调用此接口，传入 `global_collection_id / channel_id` 可以获取频道安利
+
+**必选参数：**
+
+`global_collection_id`：频道 id (global_collection_id / channel_id 均可以)
+
+**接口地址：** `/youth/channel/amway`
+
+**调用例子：** `/youth/channel/amway?global_collection_id=11576464149`
+
+### 频道 - 相似频道
+
+说明：调用此接口，传入 `global_collection_id / channel_id` 可以获取相似频道
+
+**必选参数：**
+
+`channel_id`：频道 id (global_collection_id / channel_id 均可以)
+
+**接口地址：** `/youth/channel/similar`
+
+**调用例子：** `/youth/channel/similar?channel_id=11576464149`
+
+### 频道 - 订阅
+
+说明：登录后调用此接口， 传入 `global_collection_id / channel_id` 可订阅频道
+
+**必选参数：**
+
+`global_collection_id`：频道 id (global_collection_id / channel_id 均可以)
+
+**可选参数：**
+
+`t`：1 为订阅，0 为取消订阅，不传默认为订阅
+
+**接口地址：** `/youth/channel/sub`
+
+**调用例子：** `/youth/channel/sub?global_collection_id=11576464149` `/youth/channel/sub?global_collection_id=11576464149&t=0`
+
+### 频道 - 音乐故事
+
+说明：调用此接口，传入 `global_collection_id / channel_id` 可以获取音乐故事
+
+**必选参数：**
+
+`global_collection_id`：频道 id (global_collection_id / channel_id 均可以)
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/youth/channel/song`
+
+**调用例子：** `/youth/channel/song?global_collection_id=11576464149`
+
+### 频道 - 音乐故事详情
+
+说明：调用此接口，传入 `global_collection_id / channel_id` 和 `fileid` 可以获取音乐故事详情
+
+**必选参数：**
+
+`global_collection_id`：频道 id (global_collection_id / channel_id 均可以)
+
+`fileid`: 音乐故事 fileid
+
+**接口地址：** `/youth/channel/song/detail`
+
+**调用例子：** `/youth/channel/song/detail?global_collection_id=11576464149&fileid=1720958083456581`
+
+### 动态 - 最常访问
+
+说明：登录后调用此接口，可以获取经常访问的频道和用户
+
+**接口地址：** `/youth/dynamic/recent`
+
+**调用例子：** `/youth/dynamic/recent`
+
+### 获取用户公开的音乐
+
+说明：调用此接口，可以获取用户公开的音乐
+
+**必选参数：**
+
+`userid`：用户 id
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/youth/user/song`
+
+**调用例子：** `/youth/user/song?userid=1354894105`
+
+### 听书 - 每日推荐
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/longaudio/daily/recommend`
+
+**调用例子：** `/longaudio/daily/recommend`
+
+### 听书 - 排行榜推荐
+
+**接口地址：** `/longaudio/rank/recommend`
+
+**调用例子：** `/longaudio/rank/recommend`
+
+### 听书 - VIP 推荐
+
+**接口地址：** `/longaudio/vip/recommend`
+
+**调用例子：** `/longaudio/vip/recommend`
+
+### 听书 - 每周推荐
+
+**接口地址：** `/longaudio/week/recommend`
+
+**调用例子：** `/longaudio/week/recommend`
+
+### 听书 - 专辑详情
+
+**必选参数：**
+
+`album_id`: 专辑 id 可以传多个，每个以逗号分开,
+
+**接口地址：** `/longaudio/album/detail`
+
+**调用例子：** `/longaudio/album/detail?album_id=56655759`
+
+### 听书 - 专辑音乐列表
+
+**必选参数：**
+
+`album_id`: 专辑 id 可以传多个
+
+**接口地址：** `/longaudio/album/audios`
+
+**调用例子：** `/longaudio/album/audios?album_id=56655759`
+
+### 歌曲详情 - 歌曲成绩单
+
+说明：调用此接口，可以获取`歌曲详情`里面的`歌曲成绩单`信息
+
+**必选参数：**
+
+`album_audio_id`： 专辑音乐 id (album_audio_id/MixSongID 均可以),
+
+**接口地址：** `/song/ranking`
+
+**调用例子：** `/song/ranking?album_audio_id=32155307`
+
+### 歌曲详情 - 歌曲成绩单详情
+
+说明：登陆后调用此接口，可以获取更详细的歌曲成绩单信息
+
+**必选参数：**
+
+`album_audio_id`： 专辑音乐 id (album_audio_id/MixSongID 均可以),
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/song/ranking/filter`
+
+**调用例子：** `/song/ranking/filter?album_audio_id=32155307`
+
+### 验证码 - 获取验证码格式
+
+说明：碰到错误码 20028 时，可调用该接口获取验证码的格式。
+
+**必选参数：**
+
+`eventid`：当请求出现错误码为 20028 时，一般会返回
+
+**接口地址：** `/get/verify/info`
+
+**调用例子：** `/get/verify/info?eventid=gz_tx_event_xxx`
+
+### 验证码 - 验证验证码格式
+
+说明：通过验证码后通过该请求验证。（目前仅实现了腾讯验证码，其他的没碰到）
+
+**必选参数：**
+
+`eventid`：当请求出现错误码为 20028 时，一般会返回
+
+`v_type`：`/get/verify/info` 下获取
+
+`verifycode`：通过滑块验证码等获取
+
+`sid`：通过 wasm 获取，具体可查看 `public\login_captcha.html`
+
+`edt`：同上
+
+**接口地址：** `/verify/user/info`
+
+**调用例子：** `/verify/user/info?eventid=gz_tx_event_xxx&v_type=xx&verifycode=xxx&sid=xxx&edt=xxx`
+
+### 听歌识曲
+
+说明：调用此接口，传入 PCM 音频数据（`application/octet-stream`），可识别歌曲信息。**该接口必须使用 POST 请求**
+
+**必选参数：**
+
+`data`：PCM 音频二进制数据（16bit 采样，通过 POST body 以 `application/octet-stream` 格式传入）
+
+**接口地址：** `/audio/match`
+
+**调用例子：** 使用 POST 请求，`Content-Type: application/octet-stream`，body 为 PCM 二进制数据
+
+```javascript
+// 前端示例
+const res = await fetch('/audio/match', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/octet-stream' },
+  body: pcmArrayBuffer,
+});
+```
+
+### 获取已购单曲
+
+说明：登录后调用此接口，可以获取用户已购买的单曲列表，返回歌曲详情及音频信息（需要登录）
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize`：每页页数，默认为 50
+
+**接口地址：** `/user/purchased/songs`
+
+**调用例子：** `/user/purchased/songs`
+
+### 获取已购专辑
+
+说明：登录后调用此接口，可以获取用户已购买的专辑列表（需要登录）
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize`：每页页数，默认为 15
+
+**接口地址：** `/user/purchased/albums`
+
+**调用例子：** `/user/purchased/albums`
+
+### 获取听歌等级信息
+
+说明：获取并上报用户听歌等级信息（听歌时长），登录后调用。支持两种调用方式：
+
+- **查询**（默认）：返回服务器当前累计听歌时长、等级与积分
+- **上报**：传入 `d_sec`（本地累计听歌秒数）与 `diff_sec`（本次新增秒数），同步本地累计时长
+
+统一使用 **lite v2 协议**（`userinfo.user.kugou.com/v2/get_grade_info`），不再根据平台切换 v4。
+
+**必选参数（登录态）：**
+
+`cookie`：登录凭证，需包含 `token`、`userid`，建议同时包含 `mid`、`dfid`
+
+**可选参数：**
+
+`uuid`：设备 UUID，默认从 cookie 的 uuid / KUGOU_API_GUID 读取，否则为 `-`
+
+`type`：类型，默认为 `1`
+
+**上报参数：**
+
+`d_sec`：本地累计听歌秒数（须大于等于服务器当前值）
+
+`diff_sec`：本次新增秒数，请按正常听歌节奏调用
+
+`y_type`：年份类型，默认为 `0`
+
+`m_type`：音乐类型，默认为 `0`
+
+**接口地址：** `/user/grade/info`
+
+**调用例子：**
+
+查询：`/user/grade/info?cookie=token%3Dxxx%3Buserid%3D123`
+
+上报：`/user/grade/info?cookie=token%3Dxxx%3Buserid%3D123&d_sec=123456&diff_sec=600&uuid=xxx`
+
+**返回示例：**
+
+```json
+{
+  "status": 1,
+  "error_code": 0,
+  "data": {
+    "d_sec": 125755,
+    "duration": 2095,
+    "p_grade": 3,
+    "p_current_point": 3809,
+    "p_grade_point": 3000,
+    "p_next_grade": 4,
+    "p_next_grade_point": 6000,
+    "servertime": "2026-08-05 23:10:40"
+  }
+}
+```
+
+### 上报听歌时长
+
+**接口地址：** `POST /user/listen/report`
+
+上报真实播放的开始、结束事件。结束时可联动 `/user/grade/info` 同步听歌时长。
+登录凭证可通过 `Authorization: token=...;userid=...` 或 `cookie` 传递。
+
+| 参数 | 说明 |
+| --- | --- |
+| `event` | 必填，`start` 或 `end` |
+| `mixsongid` | 必填，歌曲 mixsongid |
+| `uuid`、`mid` | 设备标识；uuid 为 32 位字母数字。支持从 cookie 的 `uuid` / `KUGOU_API_GUID`、`mid` / `KUGOU_API_MID` 读取 |
+| `device_model`、`dev` | 可选，设备名称优先取 `device_model`、`dev`，否则复用 cookie / 环境变量 `KUGOU_API_DEV`，缺省为 `KuGouMusicApi` |
+| `system_version` | 可选，系统版本；兼容默认值为 `9` |
+| `screen_width`、`screen_height` | 可选，屏幕宽高（正整数像素）；默认 `1920`、`1080` |
+| `local_ip` | 可选，事件中的设备本地 IPv4/IPv6 地址；默认 `0.0.0.0`，表示未提供具体地址 |
+| `duration` | end 必填，实际播放毫秒数，扣除暂停及拖动进度的影响 |
+| `state` | end 的播放结束状态，默认 `完整播放` |
+| `d_sec`、`diff_sec` | end 可选，必须同时提供。分别为查询所得累计基线和本次新增秒数；传入后联动等级同步 |
+
+设备名称复用项目已有的 dev 配置；系统版本和屏幕尺寸的默认值来自参考报文，并非自动识别结果。
+设备名称在设备查询、事件及报文头中保持一致；系统版本同步用于事件、报文头和 User-Agent。
+`local_ip` 不读取请求来源、不自动查询公网 IP，也不改变 HTTP 出口或代理设置。
+同一次播放的开始、结束应使用一致的设备参数；修改机型、系统版本或屏幕尺寸会重新建立会话。
+
+**请求示例：** 设备及登录信息通过 cookie 提供。
+
+```json
+{"event":"start","mixsongid":260403475}
+```
+
+```json
+{"event":"end","mixsongid":260403475,"duration":60000,"state":"完整播放","d_sec":120,"diff_sec":60}
+```
+
+不传同步参数时返回 CSCC 响应；传入后返回
+`data: { report, grade, playback_accepted, grade_synced }`，分别表示两步结果。
+CSCC 失败仍继续等级同步；至少一步成功返回 HTTP 200，两步均失败返回 HTTP 502。
+请求成功不代表累计时长立即更新，服务端可能延迟显示；请勿因此重复上报。
+接口不自动重试。HTTP 调用时，播放上报与等级信息的查询、上报均需在 URL query 中携带每次变化的 `timestamp`，避免命中响应缓存（POST 也一样，放在 body 中不能绕过 URL 缓存）。
+例如：`POST /user/listen/report?timestamp=1788850000000`。
+程序化调用：`user_listen_report(params)`。
+
+
+### 编辑内容黑名单
+
+说明：登录后调用此接口，可以添加/移除内容黑名单中的歌曲或歌手（黑名单内容不会出现在猜你喜欢、每日推荐等推荐场景中）
+
+**必选参数：**
+
+歌曲（`label=song`，默认）：
+
+`hash`: 歌曲 hash（FileHash）
+
+歌手（`label=singer`）：
+
+`singerid`: 歌手 ID
+
+**可选参数：**
+
+`name`: 显示名（歌曲为 `歌手 - 歌名`，歌手为歌手名），仅用于客户端展示，可省略
+
+`mixsongid`: 歌曲 MixSongID（`label=song` 时建议传入，用于客户端展示与跳转）
+
+`label`: 黑名单类型，`song`（歌曲，默认）或 `singer`（歌手）
+
+`isDelete`: 传 `1` 时为从黑名单移除，不传或传 `0` 为添加
+
+`items`: 批量条目（JSON 数组字符串，`[{"k":"...","v":"..."}]` 结构，传入时忽略上述单条参数）
+
+`moduleId`: 场景标识（KG-TID），默认 473（黑名单管理），可选 474（猜你喜欢）、18（每日推荐）、30（主题歌单）
+
+**接口地址：** `/blacklist`
+
+**调用例子：** `/blacklist?hash=B3A52A7A958BF0AED0EBFBA2E9A818B7&mixsongid=32100650&name=周杰伦 - 晴天`（添加歌曲），
+`/blacklist?label=singer&singerid=3520&name=周杰伦`（添加歌手）， `/blacklist?label=singer&singerid=3520&name=周杰伦&isDelete=1`（移除歌手）
+
+**返回示例：**
+
+```json
+{ "status": 1, "error_code": 0, "data": "操作成功" }
+```
+
+### 获取内容黑名单
+
+说明：登录后调用此接口，可以获取内容黑名单中的歌曲或歌手列表
+
+**可选参数：**
+
+`label`: 黑名单类型，`song`（歌曲，默认）或 `singer`（歌手）
+
+`page`: 页数，默认为 1
+
+`pagesize`: 每页页数，默认为 30，上限 500（条目总数为返回的 `total`，可翻页获取全量）
+
+`moduleId`: 场景标识（KG-TID），默认 473（黑名单管理），可选 474（猜你喜欢）、18（每日推荐）、30（主题歌单）
+
+**接口地址：** `/blacklist/list`
+
+**调用例子：** `/blacklist/list`，`/blacklist/list?label=singer&page=1&pagesize=100`
+
+**返回示例：**
+
+```json
+{
+  "status": 1,
+  "error_code": 0,
+  "data": {
+    "label": "song",
+    "source": 3,
+    "page": 1,
+    "pagesize": 30,
+    "total": 1,
+    "items": [
+      {
+        "song_k": "b3a52a7a958bf0aed0ebfba2e9a818b7",
+        "song_v": "{\"n\":\"周杰伦 - 晴天\",\"m\":\"32100650\",\"t\":\"1786957745\"}",
+        "t": 1786957745
+      }
+    ]
+  }
+}
+```
+
+### 获取歌手单曲（新版）
+
+说明 : 调用此接口 , 传入歌手 id, 可获得歌手歌曲（新版接口），每条歌曲带作者列表（`authors`），支持多歌手。
+
+**必选参数：**
+
+`id`： 歌手 id
+
+**可选参数：**
+
+`page`： 页码
+
+`pagesize`: 每页页数, 默认为 30（**上限 100**，超过返回 `error_code=20010`）
+
+`sort`: 排序，hot : 热门, new: 最新
+
+**接口地址：** `/artist/audios/new`
+
+**调用例子：** `/artist/audios/new?id=6539`
+
+### 概念版 - 免费听
+
+说明：酷狗概念版上的免费听。该接口需要调用 `/song/auth/url` 或 `/song/auth/merge/url`
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址：** `/ai/recommend/song`
+
+**调用例子：** `/ai/recommend/song`
+
+### 组队领取 VIP - 获取本期活动信息（需要登陆，该接口为测试接口，仅限概念版使用）
+
+说明：登录后调用此接口，可以获取本次组队活动信息
+
+**接口地址**： `/team/period/info`
+
+**调用例子**： `/team/period/info`
+
+### 组队领取 VIP - 获取用户组队信息（需要登陆，该接口为测试接口，仅限概念版使用）
+
+说明：登录后调用此接口，可以获取用户组队信息，比如是否加入队伍或自己创建队伍
+
+**必选参数：**
+
+`period_id`：本期活动信息返回的`id`字段
+
+**接口地址**： `/team/my/status`
+
+**调用例子**： `/team/my/status?period_id=280`
+
+### 组队领取 VIP - 获取用户自己的队伍信息（需要登陆，该接口为测试接口，仅限概念版使用）
+
+说明：登录后调用此接口，可以获取用户自己组建的队伍信息
+
+**必选参数：**
+
+`period_id`：本期活动信息返回的`id`字段
+
+**接口地址**： `/team/my/info`
+
+**调用例子**： `/team/my/info?period_id=280`
+
+### 组队领取 VIP - 创建用户自己的组队队伍（需要登陆，该接口为测试接口，仅限概念版使用）
+
+说明：登录后调用此接口，可以创建用户自己的组队队伍获取 vip
+
+**必选参数：**
+
+`period_id`：本期活动信息返回的`id`字段
+
+**接口地址**： `/team/my`
+
+**调用例子**： `/team/my?period_id=280`
+
+### 组队领取 VIP - 加入组队队伍（需要登陆，该接口为测试接口，仅限概念版使用）
+
+说明：登录后调用此接口，可以加入别人的组队队伍
+
+必选参数：`team_code`：欲加入队伍的组队码
+
+**接口地址**： `/team/join`
+
+**调用例子**： `/team/join?team_code=j9n0fd`
+
+### 音效 - 耳机列表
+
+说明：调用此接口，可以获取支持音效的耳机列表。
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址**： `/effects/brand`
+
+**调用例子**： `/effects/brand`
+
+### 音效 - 耳机音效
+
+说明：调用此接口，可以获取支持对应耳机音效列表。
+
+**必选参数：**
+
+`brand_id`：耳机 brand_id
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址**： `/effects/brand/detail`
+
+**调用例子**： `/effects/brand/detail?brand_id=77`
+
+### 音效 - 通用耳机音效
+
+说明：调用此接口，可以获取通用耳机音效。
+
+**接口地址**： `/effects/match`
+
+**调用例子**： `/effects/match`
+
+### 音效 - 明星音效
+
+说明：调用此接口，可以获取明星音效。
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址**： `/effects/artist`
+
+**调用例子**： `/effects/artist`
+
+### 音效 - 汽车列表
+
+说明：调用此接口，可以获取汽车列表。
+
+**接口地址**： `/effects/car/brand`
+
+**调用例子**： `/effects/car/brand`
+
+### 音效 - 汽车音效
+
+说明：调用此接口，可以获取支持对应汽车音效列表。
+
+**必选参数：**
+
+`rel_id`：汽车 id
+
+**可选参数：**
+
+`page`：页数
+
+`pagesize `: 每页页数, 默认为 30
+
+**接口地址**： `/effects/car/brand`
+
+**调用例子**： `/effects/car/brand/lists?rel_id=15`
+
+### 修改个人资料
+
+说明：修改登录账号的昵称、性别、生日、个性签名、地区等资料。仅需登录态，无需账号密码。
+
+**可选参数（至少提供一项）：**
+
+`nickname`：昵称
+
+`sex`：性别，`0` 女 / `1` 男 / `2` 保密
+
+`birthday`：生日，格式 `yyyy-MM-dd`，传空串可清空
+
+`signature`：个性签名，传空串可清空
+
+`province`：省份名
+
+`city`：城市名
+
+`memo`：备注
+
+`tags`：标签，传空串可清空
+
+`photo`：头像文件名（一般不直接传，改头像请用 `/user/update/avatar`）
+
+**接口地址**： `/user/update`
+
+**调用例子**： `/user/update?signature=这是新签名&sex=1`
+
+> 注意：cookie 中含 `;` 分隔符，用 GET 查询串传递容易被截断，建议改用 POST body 传 `cookie` 字段：
+> ```bash
+> curl -X POST http://127.0.0.1:3000/user/update \
+>   -H 'Content-Type: application/json' \
+>   -d '{"cookie":"token=xxx;userid=xxx","signature":"这是新签名"}'
+> ```
+
+### 修改头像
+
+说明：上传并更换账号头像。内部分两步完成：先把图片传到酷狗图床拿到文件名，再写入个人资料。
+
+**必选参数：**
+
+`imgFile`：图片数据，支持 base64 字符串、dataURL（`data:image/jpeg;base64,...`）。仅接受 JPEG / PNG / GIF / BMP / WEBP，非图片数据会被拦截并返回 400
+
+**可选参数：**
+
+`filename`：上传文件名，默认 `avatar.jpg`
+
+**接口地址**： `/user/update/avatar`
+
+**调用例子**：
+
+```bash
+curl -X POST http://127.0.0.1:3000/user/update/avatar \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","imgFile":"<base64>"}'
+```
+
+返回体在原响应基础上追加 `photo`（图床文件名）与 `pic`（完整头像 URL）两个字段。
+
+### 获取歌曲弹幕
+
+说明：获取歌曲播放器使用的旧弹幕池。该弹幕池的资源代码为 `articulossong`，与 `/comment/music` 使用的普通歌曲评论池不同，不应把两者数量混为一谈。不需要登录。
+
+**必选参数（二选一）：**
+
+`hash`：歌曲 hash，接口会自动解析弹幕资源 ID
+
+`special_id`：弹幕资源 ID，即响应中的 `special_child_id` / `childrenid`
+
+**可选参数：**
+
+`mixsongid`：歌曲 mixsongid（即 `album_audio_id`）
+
+`name`：歌曲显示名称
+
+`page`：页码，默认 1
+
+`pagesize`：每页数量，默认 20
+
+**接口地址：** `/song/barrage`
+
+**调用例子：** `/song/barrage?hash=043C4DA61870CD55C1240F0FA6744C94&page=1&pagesize=20`
+
+### 发送歌曲弹幕
+
+说明：向歌曲弹幕池发送一条弹幕。需要登录。仅传 `hash` 时，接口会先查询并解析 `special_id`。
+
+**必选参数：**
+
+`content`：弹幕文本
+
+`special_id` / `hash`：至少传入一个，含义同“获取歌曲弹幕”
+
+**可选参数：**
+
+`mixsongid`：歌曲 mixsongid
+
+`name`：歌曲显示名称
+
+**接口地址：** `/song/barrage/send`
+
+**调用例子：**
+
+```bash
+curl -X POST http://127.0.0.1:3000/song/barrage/send \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","hash":"043C4DA61870CD55C1240F0FA6744C94","mixsongid":"302362878","content":"弹幕内容"}'
+```
+
+### 获取视频弹幕
+
+说明：获取 MV 播放器展示的弹幕。客户端底层复用 MV 评论池。不需要登录。
+
+**必选参数（二选一）：**
+
+`video_id`：视频 ID
+
+`hash`：MV hash，接口会自动解析视频 ID；`mkv_sd_hash`、播放清晰度 hash 均可由上游服务映射到同一视频
+
+**可选参数：**
+
+`name`：视频名称
+
+`page`：页码，默认 1
+
+`pagesize`：每页数量，默认 20
+
+**接口地址：** `/video/barrage`
+
+**调用例子：** `/video/barrage?video_id=17633253&page=1&pagesize=20`
+
+### 发送视频弹幕
+
+说明：向 MV 视频弹幕池发送一条弹幕。需要登录。仅传 `hash` 时，接口会先查询并解析 `video_id`。
+
+**必选参数：**
+
+`content`：弹幕文本
+
+`video_id` / `hash`：至少传入一个，含义同“获取视频弹幕”
+
+**可选参数：**
+
+`name`：视频名称
+
+`pid`：回复目标评论 ID；不传表示发送顶层弹幕
+
+**接口地址：** `/video/barrage/send`
+
+**调用例子：**
+
+```bash
+curl -X POST http://127.0.0.1:3000/video/barrage/send \
+  -H 'Content-Type: application/json' \
+  -d '{"cookie":"token=xxx;userid=xxx","video_id":"17633253","name":"借梦不还","content":"弹幕内容"}'
+```
+
+> 发送接口会产生真实公开内容。请先用读取接口确认资源 ID，并避免对同一请求进行自动重试。
+
+## License
+
+[The MIT License (MIT)](https://github.com/MakcRe/KuGouMusicApi/blob/main/LICENSE)

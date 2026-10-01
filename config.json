@@ -1,0 +1,64 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 33000,
+    "openBrowser": true
+  },
+  "danmaku": {
+    "enabled": false,
+    "roomId": 0,
+    "replyEnabled": true,
+    "replyPrefix": "【点歌机】",
+    "replyCooldownMs": 5000,
+    "reconnectBaseMs": 2000,
+    "reconnectMaxMs": 60000
+  },
+  "play": {
+    "mpvPath": "",
+    "volume": 80,
+    "audioDevice": "",
+    "extraArgs": [],
+    "streamTimeoutMs": 30000,
+    "wallClockSlackMs": 30000,
+    "unknownDurationTimeoutMs": 600000
+  },
+  "order": {
+    "prefixes": [
+      "点歌"
+    ],
+    "allowStringPrefixMatch": true,
+    "userCooldownMs": 60000,
+    "queueLimit": 50,
+    "sameSongMaxTimes": 2,
+    "duplicateStrategy": "cooldown",
+    "blacklistUsers": [],
+    "blacklistWords": [],
+    "requireDanmakuSwitch": true
+  },
+  "idle": {
+    "enabled": false,
+    "source": "platform",
+    "playlistId": "",
+    "recommendCount": 20,
+    "maxTry": 6
+  },
+  "platforms": {
+    "priority": [
+      "netease",
+      "qq",
+      "kugou",
+      "kuwo"
+    ],
+    "enabled": {
+      "netease": true,
+      "qq": true,
+      "kugou": true,
+      "kuwo": true
+    }
+  },
+  "log": {
+    "danmaku": true,
+    "level": "info",
+    "keepDays": 7
+  }
+}

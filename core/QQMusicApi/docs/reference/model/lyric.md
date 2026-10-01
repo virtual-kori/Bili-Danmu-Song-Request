@@ -1,0 +1,3 @@
+# lyric
+
+::: models.lyric

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>点歌机 · OBS 展示</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: transparent; }
+      body {
+        font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+        color: #fff; overflow: hidden;
+      }
+      .wrap { display: flex; flex-direction: column; gap: 14px; padding: 18px; height: 100%; }
+      .now {
+        background: linear-gradient(120deg, rgba(10, 16, 26, 0.86), rgba(24, 34, 52, 0.8));
+        border: 1px solid rgba(120, 160, 220, 0.35);
+        border-left: 6px solid #4f9cf9;
+        border-radius: 14px; padding: 14px 18px; backdrop-filter: blur(6px);
+      }
+      .label { font-size: 12px; letter-spacing: 2px; color: #8fc4ff; margin-bottom: 6px; }
+      .title { font-size: 30px; font-weight: 700; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6); }
+      .artist { font-size: 17px; color: #cfe0f5; margin-top: 4px; }
+      .meta { font-size: 13px; color: #9db2cc; margin-top: 8px; }
+      .bar { height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.15); margin-top: 12px; overflow: hidden; }
+      .fill { height: 100%; width: 0; background: linear-gradient(90deg, #4f9cf9, #7c5cff); transition: width 0.4s linear; }
+      .queue { flex: 1; overflow: hidden; }
+      .queue h3 { font-size: 13px; letter-spacing: 2px; color: #8fc4ff; margin: 0 0 8px; font-weight: 600; }
+      .queue ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+      .queue li {
+        background: rgba(10, 16, 26, 0.72); border: 1px solid rgba(120, 160, 220, 0.22);
+        border-radius: 10px; padding: 8px 12px; font-size: 15px; display: flex; gap: 10px; align-items: baseline;
+      }
+      .queue li.pin { border-color: rgba(245, 181, 68, 0.6); }
+      .idx { color: #7f93ad; font-size: 12px; min-width: 18px; }
+      .qname { font-weight: 600; }
+      .qsinger { color: #9db2cc; font-size: 12.5px; }
+      .qreq { margin-left: auto; color: #7c93b0; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="now">
+        <div class="label">正在播放</div>
+        <div class="title" id="nowName">暂无播放</div>
+        <div class="artist" id="nowSinger"></div>
+        <div class="meta" id="nowMeta"></div>
+        <div class="bar"><div class="fill" id="fill"></div></div>
+      </div>
+      <div class="queue">
+        <h3>待播放队列</h3>
+        <ul id="list"></ul>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var state = null;
+        function esc(s) {
+          return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+          });
+        }
+        function render() {
+          if (!state) return;
+          var cur = state.current;
+          document.getElementById('nowName').textContent = cur ? cur.name : '暂无播放';
+          document.getElementById('nowSinger').textContent = cur ? cur.singer || '' : '';
+          document.getElementById('nowMeta').textContent = cur
+            ? (cur.platformLabel || '') + (cur.requester ? ' · 点歌人 ' + cur.requester : '') + (cur.qualityLabel ? ' · ' + cur.qualityLabel : '')
+            : (state.switches && state.switches.idleAutoPlay ? '空闲，等待推荐曲目' : '空闲');
+          var dur = cur ? Number(cur.duration) || 0 : 0;
+          var pos = cur ? Number(cur.position) || 0 : 0;
+          document.getElementById('fill').style.width = dur > 0 ? Math.min(100, (pos / dur) * 100) + '%' : '0%';
+          var q = state.queue || [];
+          var html = q.slice(0, 8).map(function (it, i) {
+            return '<li class="' + (it.pinned ? 'pin' : '') + '"><span class="idx">' + (i + 1) + '</span>' +
+              '<span class="qname">' + esc(it.name) + '</span>' +
+              '<span class="qsinger">' + esc(it.singer || '') + '</span>' +
+              '<span class="qreq">' + esc(it.requester || '') + '</span></li>';
+          }).join('');
+          if (q.length > 8) html += '<li><span class="idx">…</span><span class="qsinger">还有 ' + (q.length - 8) + ' 首</span></li>';
+          document.getElementById('list').innerHTML = html || '<li><span class="qsinger">队列为空</span></li>';
+        }
+        function connect() {
+          var proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
+          var ws = new WebSocket(proto + location.host + '/ws');
+          ws.onmessage = function (ev) {
+            try {
+              var m = JSON.parse(ev.data);
+              if (m.type === 'state') { state = m.data; render(); }
+            } catch (e) {}
+          };
+          ws.onclose = function () { setTimeout(connect, 1500); };
+        }
+        fetch('/api/state').then(function (r) { return r.json(); }).then(function (r) { if (r.ok) { state = r.data; render(); } });
+        connect();
+      })();
+    </script>
+  </body>
+</html>

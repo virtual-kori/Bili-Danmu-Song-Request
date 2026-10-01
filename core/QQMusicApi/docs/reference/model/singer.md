@@ -1,0 +1,3 @@
+# singer
+
+::: models.singer

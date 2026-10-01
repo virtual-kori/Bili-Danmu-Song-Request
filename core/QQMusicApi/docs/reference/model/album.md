@@ -1,0 +1,3 @@
+# album
+
+::: models.album

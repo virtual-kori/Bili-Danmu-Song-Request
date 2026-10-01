@@ -1,0 +1,3 @@
+# LyricApi
+
+::: modules.lyric.LyricApi

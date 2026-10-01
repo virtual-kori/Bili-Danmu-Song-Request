@@ -1,0 +1,27 @@
+{
+  "netease": {
+    "label": "网易云音乐",
+    "port": 33011,
+    "cookie": "",
+    "loggedInUser": ""
+  },
+  "qq": {
+    "label": "QQ音乐",
+    "port": 33012,
+    "cookie": "",
+    "loggedInUser": ""
+  },
+  "kugou": {
+    "label": "酷狗音乐",
+    "port": 33013,
+    "cookie": "",
+    "loggedInUser": ""
+  },
+  "kuwo": {
+    "label": "酷我音乐",
+    "port": 33014,
+    "cookie": "",
+    "token": "",
+    "loggedInUser": ""
+  }
+}

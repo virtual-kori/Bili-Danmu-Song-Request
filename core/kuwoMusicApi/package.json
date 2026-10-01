@@ -1,0 +1,78 @@
+{
+  "name": "kuwomusicapi",
+  "version": "1.0.0",
+  "description": "Egg for 酷我音乐API;酷我音乐API Node.js版",
+  "private": true,
+  "keywords": [
+    "酷我音乐API Node.JS版",
+    "音乐API",
+    "酷我音乐API"
+  ],
+  "egg": {
+    "typescript": true,
+    "declarations": true
+  },
+  "scripts": {
+    "start": "npm run ci && egg-scripts start --port=7002 --daemon --title=egg-server-kuwoMusicApi",
+    "stop": "egg-scripts stop --title=egg-server-kuwoMusicApi",
+    "docs": "docsify serve ./docs",
+    "dev": "npm run clean && egg-bin dev --port 7002",
+    "debug": "egg-bin debug",
+    "test-local": "egg-bin test",
+    "test": "npm run lint -- --fix && npm run test-local",
+    "cov": "egg-bin cov",
+    "tsc": "ets && tsc -p tsconfig.json",
+    "ci": "npm run lint && npm run cov && npm run tsc",
+    "autod": "autod",
+    "lint": "eslint . --ext .ts",
+    "clean": "tsc -b --clean"
+  },
+  "dependencies": {
+    "docsify": "^4.13.1",
+    "egg": "^3.17.3",
+    "egg-cors": "^2.2.3",
+    "egg-scripts": "^2.17.0",
+    "fs-extra": "^11.1.1",
+    "iconv-lite": "^0.6.3",
+    "needle": "^3.2.0",
+    "uuid": "^9.0.0",
+    "zlib": "^1.0.5"
+  },
+  "devDependencies": {
+    "@eggjs/tsconfig": "^1.3.3",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.4.4",
+    "@types/supertest": "^2.0.12",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "autod": "^3.1.2",
+    "autod-egg": "^1.1.0",
+    "docsify-cli": "^4.4.4",
+    "egg-bin": "^6.4.1",
+    "egg-ci": "^2.2.0",
+    "egg-mock": "^5.10.8",
+    "eslint": "^8.45.0",
+    "eslint-config-egg": "^12.2.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-html": "^7.1.0",
+    "eslint-plugin-jsdoc": "^46.4.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "tslib": "^2.6.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "ci": {
+    "version": "8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QiuYaohong/kuwoMusicApi.git"
+  },
+  "eslintIgnore": [
+    "coverage"
+  ],
+  "author": "qyhqiu",
+  "license": "ISC"
+}
