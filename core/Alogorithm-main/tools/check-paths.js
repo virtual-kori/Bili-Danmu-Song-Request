@@ -33,7 +33,13 @@ let scanned = 0;
     return;
   }
   for (const e of entries) {
-    if (e.name === 'node_modules' || e.name === '.git') continue;
+    // 第三方依赖与前置运行时都不扫：
+    //   node_modules  第三方依赖
+    //   node/python   前置运行时（二进制 + 官方附带脚本）
+    if (e.name === 'node_modules' || e.name === '.git' || e.name === 'node' || e.name === 'python') continue;
+    // Alogorithm-main/tools 下是自检脚本：它们内部含有「用于查找绝对路径」的正则样本，
+    // 扫它们等于自我匹配，所以整目录跳过。
+    if (e.isDirectory() && e.name === 'tools' && path.basename(dir) === 'Alogorithm-main') continue;
     const p = path.join(dir, e.name);
     if (e.isDirectory()) {
       walk(p);

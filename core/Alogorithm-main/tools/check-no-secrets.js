@@ -68,13 +68,14 @@ function scanFile(file) {
   }
 
   // 2) 明显的长凭据字面量（源码/文档里被误提交的真实值）
-  //    注意判据要严：示例占位符（xxx / *** / <...>）和 npm 依赖名不能算。
+  //    注意判据要严：示例占位符（xxx / *** / <...>）、全 0 的脱敏掩码、npm 依赖名都不能算。
+  const notMask = (s) => !/^0+$/.test(s);
+  const uw = /(userid=(\d{6,});\s*(?:\w+=[^;'"]*;\s*)*?(?:websid|sid)=(\d{6,}))/.exec(text);
   const literal =
     /(MUSIC_U\s*=\s*[A-Za-z0-9+/=]{40,})/.exec(text) ||
     /(SESSDATA\s*=\s*(?!\*{3}|<)[A-Za-z0-9%_,]{25,})/.exec(text) ||
     /(qm_keyst\s*=\s*(?!W_X_xxx|x{4,})[A-Za-z0-9_-]{25,})/.exec(text) ||
-    // 完整的一段酷我登录 Cookie（必须有实打实的 sid/websid/token 组合）
-    /(userid=\d{6,};\s*(?:\w+=[^;'"]*;\s*)*?(?:websid|sid)=\d{6,})/.exec(text);
+    (uw && notMask(uw[2]) && notMask(uw[3]) ? [uw[1]] : null);
   if (literal) {
     findings.push({ file: rel(file), what: '疑似真实凭据字面量：' + String(literal[0]).slice(0, 44) + '…', level: 'BAD' });
   }

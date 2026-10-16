@@ -2,6 +2,21 @@
 title DianGeJi - Platform Login
 cd /d "%~dp0.."
 
+
+rem --- BUNDLED_NODE_DETECT: prefer the bundled Node, fall back to system Node ---
+set "NODE_BIN="
+set "NODE_SRC="
+if exist "core\node\node.exe" set "NODE_BIN=core\node\node.exe"
+if not defined NODE_BIN if exist "node\node.exe" set "NODE_BIN=node\node.exe"
+if defined NODE_BIN set "NODE_SRC=bundled"
+if not defined NODE_BIN (
+  where node >nul 2>nul
+  if not errorlevel 1 (
+    set "NODE_BIN=node"
+    set "NODE_SRC=system"
+  )
+)
+
 :menu
 cls
 echo ============================================================
@@ -33,7 +48,8 @@ if not defined PLATFORM goto menu
 
 if not exist "core\Alogorithm-main\tools\login.js" goto NOFILES
 
-node "core\Alogorithm-main\tools\login.js" %PLATFORM%
+if not defined NODE_BIN goto NONODE
+"%NODE_BIN%" "core\Alogorithm-main\tools\login.js" %PLATFORM%
 set PLATFORM=
 echo.
 pause
@@ -43,7 +59,7 @@ goto menu
 if not exist "core\Alogorithm-main\tools\login.js" goto NOFILES
 for %%P in (netease qq kugou kuwo) do (
   echo.
-  node "core\Alogorithm-main\tools\login.js" %%P --status
+  "%NODE_BIN%" "core\Alogorithm-main\tools\login.js" %%P --status
 )
 echo.
 pause
@@ -53,6 +69,14 @@ goto menu
 echo.
 echo [ERROR] Missing core\Alogorithm-main\tools\login.js
 echo         This script must stay inside the "core" folder of the player.
+echo.
+pause
+exit /b 1
+
+:NONODE
+echo [ERROR] Node.js runtime not found.
+echo         Expected a bundled runtime at: node\node.exe
+echo         Or install Node.js 18 or newer: https://nodejs.org/
 echo.
 pause
 exit /b 1

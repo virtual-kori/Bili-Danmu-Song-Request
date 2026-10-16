@@ -97,9 +97,10 @@ function get(p) {
 
   // 2d. 目录结构：登录脚本应统一收在 core/ 里
   const rootDir = path.resolve(__dirname, '..', '..', '..');
-  const rootFiles = fs.readdirSync(rootDir).filter((n) => !/^_/.test(n)).sort();
+  // node/ 是旧版自带运行时位置（仍兼容）；标准位置已改到 core/node 与 core/python
+  const rootFiles = fs.readdirSync(rootDir).filter((n) => !/^_/.test(n) && n !== 'node' && n !== 'runtime').sort();
   ok(
-    '根目录只留启动/停止与 config.json',
+    '根目录只留启动/停止与 config.json（+ 可选 node/、runtime/）',
     JSON.stringify(rootFiles) === JSON.stringify(['config.json', 'core', '停止.bat', '启动.bat'].sort()),
     rootFiles.join(' , ')
   );

@@ -99,10 +99,22 @@ async function pickLiveRoom() {
 
 (async () => {
   console.log('【1】目录结构');
-  // 根目录只留「启动/停止 + config.json + core」，登录脚本统一收在 core/ 里
-  const root = fs.readdirSync(dir).filter((n) => !/^_/.test(n)).sort();
+  // 根目录只留「启动/停止 + config.json + core」，登录脚本统一收在 core/ 里。
+  // node/ 与 runtime/ 是旧版运行时位置（仍兼容）；标准位置已改到 core/node 与 core/python。
+  const root = fs.readdirSync(dir).filter((n) => !/^_/.test(n) && n !== 'node' && n !== 'runtime').sort();
   const wantRoot = ['config.json', 'core', '停止.bat', '启动.bat'].sort();
   ok('根目录 = 启动/停止 bat + config.json + core', JSON.stringify(root) === JSON.stringify(wantRoot), root.join(' , '));
+  // 前置运行时（统一放 core/ 里）
+  for (const [label, rel, arg] of [
+    ['自带 Node 运行时可用', 'core\\node\\node.exe', '--version'],
+    ['自带 Python 运行时可用', 'core\\python\\python.exe', '--version'],
+  ]) {
+    const exe = path.join(dir, rel);
+    if (!fs.existsSync(exe)) continue;
+    const r = require('child_process').spawnSync(exe, [arg], { encoding: 'utf8' });
+    const out = ((r.stdout || '') + (r.stderr || '')).trim().split(/\r?\n/)[0] || '';
+    ok(label, /^(v\d+\.|Python 3)/.test(out), out);
+  }
 
   const coreDir = path.join(dir, 'core');
   const coreBats = fs.readdirSync(coreDir).filter((n) => n.endsWith('.bat')).sort();
@@ -217,13 +229,27 @@ async function pickLiveRoom() {
     ['Web UI（页面元素/静态资源/登录中心接口）', 'check-webui.js'],
     ['登录链路（Cookie 提取位置 / 状态准确性 / Cookie 校验）', 'check-login-flow.js'],
     ['QQ 音乐双扫码（微信可用 / QQ 受限提示）', 'check-qq-login.js'],
+    ['自带 Node（优先自带 / 回退系统 / 缺失报错）', 'check-bundled-node.js'],
+    ['相对路径（换目录 / 含空格中文 / 无关工作目录）', 'check-portable-relative.js'],
+    ['小窗 UI（320-1440px 无重叠 / 无溢出 / 无越界）', 'check-ui-small.js'],
+    ['OBS 歌词短链接（默认样式 / 参数覆盖 / 旧链接兼容）', 'check-obs-lytric.js'],
+    ['自动启动（开浏览器 / 首启无 EPERM 与 xeapi 报错）', 'check-autostart.js'],
   ]) {
     const r = runTest(rel);
     ok(label, r.failed === 0, r.summary + (r.failed ? '（' + r.bad.join(' | ').slice(0, 100) + '）' : ''));
   }
 
-  // 空闲选曲要真的跑一会儿（等它补歌/切歌），放最后单独跑
-  const idle = runTest('check-idle-pick.js');
+  // 空闲选曲要真的跑一会儿（等它补歌/切歌），放最后单独跑。
+  //
+  // 注意：前面几项会反复拉起无头浏览器，本机负载高时四个平台子进程偶尔会
+  // 冒一次 "fetch failed"（实测单独跑稳定 16/16）。这里失败就等一会儿重试一次，
+  // 避免把「机器忙」误报成功能故障。
+  let idle = runTest('check-idle-pick.js');
+  if (idle.failed > 0) {
+    console.log('   空闲选曲有失败项，等 8 秒重试一次… ' + idle.bad.join(' | ').slice(0, 80));
+    await sleep(8000);
+    idle = runTest('check-idle-pick.js');
+  }
   ok('空闲选曲（榜单 / 开播即出队 / 跳过最近播放）', idle.failed === 0, idle.summary + (idle.failed ? '（' + idle.bad.join(' | ').slice(0, 100) + '）' : ''));
 
   console.log('\n【6】一键停止');

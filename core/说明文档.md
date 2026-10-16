@@ -2,43 +2,29 @@
 
 本机运行的 B 站直播弹幕点歌系统：抓取直播间弹幕 → 识别「点歌」指令 → 四平台（网易云 / QQ 音乐 / 酷狗 / 酷我）搜索匹配 → 加入未播放队列 → 用 MPV 逐首播放 → Web UI 实时管理。
 
-本项目由: 半遥狐 开发开源
-特别鸣谢: 喵的喵的喵cat(Bili UID:3546819585902757)
-如果可以请支持一下 喵的喵的喵cat 吧
-
 ---
 
-## 一、注意事项
-
-1. 本项目使用了其他项目的代码:
-  **KuwoMusicApi**`https://github.com/GSQZ/KuwoMusicApi`
-  **KuGouMusicApi**`https://github.com/MakcRe/KuGouMusicApi`
-  **QQMusicApi**`https://github.com/L-1124/QQMusicApi`
-  **NeteaseMusic-API**`https://github.com/xgxdmx/NeteaseMusic-API`
-2. 本产品仅用于学习交流，造成一切后果自行承担
-3. 音乐平台不易，请遵守平台规定，保护歌曲版权
-4. 代码允许二次开发，禁止任何形式的商业活动
-5. 请遵守AGPLv3开源协议
-
----
-
-## 二、快速开始
+## 一、快速开始
 
 1. 双击根目录的 **`启动.bat`**
-2. 浏览器会自动打开 `http://127.0.0.1:33000`（未自动打开就手动访问）
+2. 等它打印 `=== 启动完成，等待点歌 ===` —— 此时**浏览器会自动打开** `http://127.0.0.1:33000`。
+   自动打开刻意放在**最后**：四个平台 API 已就绪、B 站弹幕也已接入，所以页面一打开就是可用状态。
+   万一没弹出来，手动在浏览器访问这个地址即可
+   （自动打开由配置 `server.openBrowser` 控制，填 `false` 可关掉）
 3. 点顶栏的 **「账号登录」**，把 B 站和音乐平台登录好
 4. 在右侧「直播间弹幕」填入直播间房间号，点「连接」
 5. 观众发送 `点歌 歌名 歌手`，即可入队播放
 
 停止服务：双击 **`停止.bat`**（会一并关闭四个平台 API 与残留的 MPV 进程）。
 
-> **环境要求**：Windows 10/11 + Node.js 18 以上（本机用 Node 24 验证）。
+> **环境要求**：Windows 10/11 + Node.js 18 以上。发行包里已自带 Node（`core\node`）与 Python（`core\python`），
+> 没装 Node 的电脑也能直接双击 `启动.bat` 运行。
 > **注意**：`core` 文件夹与两个 bat 必须保持同级，不要改名或单独移动。
 > 除了网页登录，也可以双击 `core\登录.bat`（菜单式）或 `core\登录网易云.bat` / `core\登录酷我.bat` 等命令行登录。
 
 ---
 
-## 三、目录结构
+## 二、目录结构
 
 根目录只保留「一键启停脚本 + 主配置」，其余全部在 `core/` 里，**所有路径都是相对路径，整个文件夹可以随便改名或移动到任何位置**：
 
@@ -75,7 +61,7 @@
 
 ---
 
-## 四、Web UI 功能
+## 三、Web UI 功能
 
 访问 `http://127.0.0.1:33000`。
 
@@ -112,26 +98,31 @@
 | 用途 | 地址 | 说明 |
 | --- | --- | --- |
 | 「正在播放 + 队列」展示层 | `http://127.0.0.1:33000/obs` | 透明背景，约 800×450 |
-| **独立歌词层** | `http://127.0.0.1:33000/obs-lyrics` | **透明背景，只显示歌词**，专门叠加在画面底部 |
+| **独立歌词层** | `http://127.0.0.1:33000/obs-lytric` | **透明背景，只显示歌词**，专门叠加在画面底部。固定短链接，直接粘进 OBS 即可 |
 
-**歌词层建议这样用**：在「歌词设置」面板里调好配色、字号、模式与对齐 → 点**「复制链接」** → OBS 里「来源 → 加号 → 浏览器」→ URL 粘贴 → **宽 1200、高 300**。
+**歌词层建议这样用**：OBS 里「来源 → 加号 → 浏览器」→ URL 填 `http://127.0.0.1:33000/obs-lytric` → **宽 1200、高 300**。
+网页「歌词设置」里点**「复制链接」**拿到的就是这条短链接。
 
-链接会把当前所有设置写进查询参数，所以每个 OBS 场景都能有自己的样式。支持的参数：
+短链接自带一套默认样式（就是下面表格里那份），**不需要在 URL 里写任何参数**。
+如果想临时改某一项，在后面接参数即可，例如 `/obs-lytric?sizeCur=6&mode=single`；没写的项继续用默认值。
 
-| 参数 | 含义 | 默认 |
+| 参数 | 含义 | 短链接默认值 |
 | --- | --- | --- |
-| `cur` / `other` | 当前行 / 其他行颜色（6 位十六进制，不带 `#`） | `ffffff` / `8ea0b8` |
-| `sizeCur` / `sizeOther` | 当前行 / 其他行字号，单位 `vh`（跟着源高度缩放） | `11` / `4.5` |
+| `cur` / `other` | 当前行 / 其他行颜色（6 位十六进制，不带 `#`） | `ff8fb1` / `c9a7ff` |
+| `sizeCur` / `sizeOther` | 当前行 / 其他行字号，单位 `vh`（跟着源高度缩放） | `4` / `2` |
 | `mode` | 歌词模式：`single` 单行 / `two` 两行 / `three` 三行 / `scroll` 滚动 | `two` |
 | `halign` | 左右对齐：`left` / `center` / `right` | `center` |
-| `valign` | 上下对齐：`top` / `middle` / `bottom` | `bottom` |
+| `valign` | 上下对齐：`top` / `middle` / `bottom` | `middle` |
 | `css` | **自定义 CSS**，原样注入页面（需 URL 编码） | 空 |
-| `glow` | 当前行发光 | `0` |
-| `song` | `1` 时「无歌词」显示歌名 | `0` |
-| `showMeta` | `1` 时把「作词/作曲」也当歌词显示 | `0` |
-| `waiting` | `1` 时空闲不显示提示文字 | `0` |
+| `glow` | 当前行发光 | `1` |
+| `song` | `1` 时「无歌词」显示歌名 | `1` |
+| `showMeta` | `1` 时把「作词/作曲」也当歌词显示 | `1` |
+| `waiting` | `1` 时空闲不显示提示文字 | `1` |
 | `align` | `halign` 的旧名字，仍兼容 | — |
 | `debug` | `1` 画一条底部参考线，方便在 OBS 里对齐 | 关 |
+
+> 旧的 `/obs-lyrics`（以及别名 `/obs/lyrics`）**仍然可用**，已经填进 OBS 的旧链接不会失效，
+> 但它不会自动带默认参数，样式全看 URL 里的查询参数。
 
 **四种歌词模式**：
 
@@ -163,11 +154,12 @@ body { background: rgba(0,0,0,.35); border-radius: 18px; }
 手写链接的例子：
 
 ```
-http://127.0.0.1:33000/obs-lyrics?cur=ffd166&sizeCur=10&mode=single&halign=left
-http://127.0.0.1:33000/obs-lyrics?mode=scroll&sizeCur=12&valign=middle
+http://127.0.0.1:33000/obs-lytric?cur=ffd166&sizeCur=10&mode=single&halign=left
+http://127.0.0.1:33000/obs-lytric?mode=scroll&sizeCur=12&valign=middle
 ```
 
-> 提示：改完设置后链接会自动更新，重新点「复制链接」再换掉 OBS 里的 URL 即可。路径 `/obs/lyrics` 是等价别名。
+> 提示：**直接用 `http://127.0.0.1:33000/obs-lytric` 就够了**，不带参数也能正常显示。
+> 旧路径 `/obs-lyrics` 与别名 `/obs/lyrics` 仍然保留，保证已填进 OBS 的链接不失效。
 
 ### 弹幕捕捉说明
 
@@ -187,7 +179,7 @@ http://127.0.0.1:33000/obs-lyrics?mode=scroll&sizeCur=12&valign=middle
 
 ---
 
-## 五、弹幕指令
+## 四、弹幕指令
 
 | 弹幕 | 效果 |
 | --- | --- |
@@ -214,7 +206,7 @@ http://127.0.0.1:33000/obs-lyrics?mode=scroll&sizeCur=12&valign=middle
 
 ---
 
-## 六、匹配与播放规则
+## 五、匹配与播放规则
 
 ### 匹配优先级（同优先级按平台顺序）
 
@@ -259,7 +251,7 @@ IDLE + 队列非空 → 取队首 → 启动 MPV
 
 ---
 
-## 七、配置文件
+## 六、配置文件
 
 主配置 `config.json` 在根目录，Web UI 上的改动会写回这里。
 
@@ -308,7 +300,7 @@ IDLE + 队列非空 → 取队首 → 启动 MPV
 
 ---
 
-## 八、登录中心（Web UI 一站式）
+## 七、登录中心（Web UI 一站式）
 
 点**顶栏的「登录中心」按钮**（上面显示已登录数，如 `登录中心 2/5`），打开设置中心后默认停在「账号登录」标签页；「直播间弹幕」和「平台优先级」是同弹窗里的另外两个标签页。
 
@@ -319,7 +311,7 @@ IDLE + 队列非空 → 取队首 → 启动 MPV
 | 哔哩哔哩（弹幕来源） | ✅ | ✅ | **建议必须登录**：未登录时 B 站会把昵称打码成 `*`、`uid` 置 0，且无法回复弹幕 |
 | 网易云音乐 | ✅ | ✅ | 登录 VIP 后可取无损 / 母带直链 |
 | 酷狗音乐 | ✅ | ✅ | 登录后可取无损 FLAC / 320 直链 |
-| QQ 音乐 | ✅ **微信扫码**（推荐）/ ⚠️ QQ 扫码 | ✅ | **微信扫码实测可用**；QQ 扫码被腾讯限制。界面里可切换，默认微信 |
+| QQ 音乐 | ✅ **微信扫码**（推荐）/ ⚠️ QQ 扫码 | ✅ | **微信扫码实测可用**；QQ 扫码被腾讯限制（二维码是「下载 App」链接）。界面里可切换，默认微信 |
 | 酷我音乐 | ✅ **微信扫码** | ✅ | **用微信扫一扫登录**。登录后取无损 FLAC / 320；未登录走匿名接口，标准 128k |
 
 **扫码登录**：点「获取二维码」→ 二维码直接显示在弹窗里（同时会存一份 PNG 到 `core/Alogorithm-main/logs/`）→ 用手机 App 扫 → 界面实时显示「等待扫码 / 已扫码待确认 / 登录成功」。
@@ -337,6 +329,56 @@ IDLE + 队列非空 → 取队首 → 启动 MPV
 整个过程在本地完成，界面里就是「获取微信二维码 → 手机微信扫一扫 → 手机上点确认 → 自动登录成功」。
 登录 Cookie 会同时写入 `core/platform-ports.json` 和酷我本地服务的 `live/data/cookie.json`。
 登录态判定规则（`userid` + 任一登录令牌）由 `core/kuwoMusicApi/live/wechat-login.js` 统一提供，三处共用，避免逻辑漂移。
+
+**前置运行时（自带，免安装）**
+
+所有前置统一放在 **`core\`** 里：
+
+```
+core\node\node.exe        Node v22.14.0   ← 启动脚本优先用它
+core\python\python.exe    Python 3.13.14  ← 随包提供
+```
+
+启动脚本的查找顺序：
+
+```
+core\node\node.exe 存在 → 用它          （标准位置）
+node\node.exe 存在      → 用它          （旧位置，兼容）
+都不存在                → 回退系统 PATH 的 node
+全都没有                → 明确报错，提示放运行时到 core\node\node.exe
+```
+
+所以打包出去的目录可以**直接复制到没装 Node 的电脑上双击 `启动.bat`**。
+（自带 Node 具备本项目需要的 `fetch` / `WebSocket` / `AbortSignal.timeout`；
+ 子进程由 `spawn(process.execPath)` 启动，会自动沿用同一个运行时，不会串到系统 Node。）
+
+**关于 `core\python` 与 QQ 音乐的 Python 代码**
+
+`core\QQMusicApi` 里确实带了 **144 个 `.py` 文件**（上游那套 `qqmusic_api/` Python 库）。
+需要说明清楚：**本项目运行时并不调用 Python** —— QQ 音乐服务跑的是 `live\server.js`，
+是纯 Node 实现（微信扫码那套配方就是从 `qqmusic_api/modules/login.py` 移植过来的）。
+带上 Python 是为了让这套库本身能直接用（例如 `core\QQMusicApi\examples`、
+`core\QQMusicApi\web`，以及上游用到的 mqtt 手机端扫码）。
+
+**全部使用相对路径。** 启动脚本一律用 `%~dp0`（脚本自身所在目录）定位本体，源码里一律用 `__dirname` 推导，
+不含任何盘符或用户名。已实测：把整个目录放到**含空格与中文**的路径下、并从**无关的工作目录**启动，依然正常。
+
+**打包 / 生成干净副本**
+
+```powershell
+# 生成「自带前置运行时的便携版」目录 + DianGeJi-Portable.zip（自动清数据、脱敏、自查）
+node core\Alogorithm-main\tools\make-portable.js
+#   可用 --node / --python 指定运行时来源，--out 指定输出目录
+
+# 只生成干净副本（不带运行时，不含任何凭据与直播间信息）
+node core\Alogorithm-main\tools\make-clean-copy.js
+
+# 让已有目录的启动脚本改用自带 Node（自动探测 core\node 或 node）
+node core\Alogorithm-main\tools\use-bundled-node.js [项目目录]
+
+# 隐私自查：确认没有 Cookie / 登录态 / 房间号 / 弹幕日志残留
+node core\Alogorithm-main\tools\check-no-secrets.js [要检查的目录]
+```
 
 **网易云扫码登录的两个关键点**（参照 `B站弹幕点歌机器人便携版` 的实现补齐）：
 
@@ -434,7 +476,7 @@ node core\Alogorithm-main\tools\login.js qq --cookie    # 改用粘贴 Cookie
 
 ---
 
-## 九、各平台实现说明与已知限制
+## 八、各平台实现说明与已知限制
 
 | 平台 | 搜索实现 | 取直链实现 | 限制 |
 | --- | --- | --- | --- |
@@ -455,7 +497,7 @@ node core\Alogorithm-main\tools\login.js qq --cookie    # 改用粘贴 Cookie
 
 ---
 
-## 十、自检与运维脚本
+## 九、自检与运维脚本
 
 全部位于 `core/Alogorithm-main/tools/`，在根目录执行（需先双击 `启动.bat` 把服务跑起来）：
 
@@ -488,6 +530,21 @@ node core\Alogorithm-main\tools\check-login-flow.js
 # QQ 音乐双扫码验证：微信扫码可用、QQ 扫码受限提示、切换不互相影响
 node core\Alogorithm-main\tools\check-qq-login.js
 
+# 自带 Node：优先 core\node\node.exe，兼容 node\node.exe，缺失回退系统 Node，全都没有则报错
+node core\Alogorithm-main\tools\check-bundled-node.js
+
+# 相对路径：换目录、含空格与中文、从无关工作目录启动都要能跑
+node core\Alogorithm-main\tools\check-portable-relative.js
+
+# 小窗 UI：320-1440px 各宽度下不能有卡片重叠 / 横向溢出 / 元素越界
+node core\Alogorithm-main\tools\check-ui-small.js
+
+# OBS 歌词短链接：默认样式、参数覆盖、旧链接兼容
+node core\Alogorithm-main\tools\check-obs-lytric.js
+
+# 自动启动：开浏览器、首启无 EPERM / xeapi 报错
+node core\Alogorithm-main\tools\check-autostart.js
+
 # 弹幕捕捉实测：连一个真实直播间，验证真能收到弹幕
 node core\Alogorithm-main\tools\check-danmaku-live.js 21452505
 
@@ -512,7 +569,7 @@ node core\Alogorithm-main\tools\stop-all.js
 
 ---
 
-## 十一、常见问题
+## 十、常见问题
 
 **Q：双击 `启动.bat` 后窗口一闪而过？**
 看窗口里的提示。最常见是 Node.js 未安装或不在 PATH。

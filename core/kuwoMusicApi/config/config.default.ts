@@ -17,8 +17,8 @@ export default (appInfo: EggAppInfo) => {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
     headers: {
       /**
-       * _ga=GA1.2.675600123.1604474404; gid=<已脱敏>; JSESSIONID=<已脱敏>; uname3=<昵称已脱敏>; t3kwid=000000000; userid=000000000; websid=000000000;
-       * pic3="<头像地址已脱敏>";
+       * _ga=GA1.2.675600123.1604474404; gid=<redacted>; JSESSIONID=<redacted>; uname3=<redacted>; t3kwid=000000000; userid=000000000; websid=000000000;
+       * pic3="<redacted>";
        * t3=weixin; Hm_lvt_cdb524f42f0ce19b169a8071123a4797=1622942674,1623162158,1623249078,1623338422; Hm_lpvt_cdb524f42f0ce19b169a8071123a4797=1623338422;
        *  _gid=GA1.2.85752388.1623338422; kw_token=9ACQW0P7QIP; _gat=1
        */

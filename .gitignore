@@ -1,0 +1,28 @@
+# ==== 便携版运行时（体积过大，不入库）====
+# 内置 Node.js 运行时（约 86 MB）
+/core/node/
+# 内置 Python 运行时（约 64 MB）
+/core/python/
+# Python 虚拟环境
+**/.venv/
+**/venv/
+
+# ==== Python 缓存 ====
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# ==== 运行期数据与日志 ====
+/core/Alogorithm-main/logs/
+*.log
+
+# ==== 旧版本残留 ====
+# 程序已不再读取（主配置入口是根目录 config.json，见 core/Alogorithm-main/core/config.js）
+/core/Alogorithm-main/config.json
+
+# ==== 系统与编辑器杂物 ====
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+*~

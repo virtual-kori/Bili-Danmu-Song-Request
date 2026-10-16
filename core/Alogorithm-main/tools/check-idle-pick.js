@@ -48,8 +48,41 @@ async function cleanup() {
     const sample = list[0] ? list[0].name + ' - ' + list[0].singer : '';
     ok(key + ' 榜单可用', list.length > 0, list.length + ' 首' + (sample ? '（如 ' + sample + '）' : ''));
     if (list.length) {
-      const r = await a.resolveUrl(list[0]);
-      ok(key + ' 榜单首曲可播放', Boolean(r && r.ok), (r && (r.qualityLabel || r.error)) || '');
+      // 榜单里**某一首**取不到直链是正常的（没版权 / 地区限制 / 需要会员），
+      // 所以多试几首 —— 只要有一首能取到，就说明该平台链路是通的。
+      //
+      // 另外：同时起四个平台服务 + 浏览器时，偶尔会碰到一次 "fetch failed"
+      // （子进程刚起来/本机并发高）。这种瞬时错误重试一下，别当成功能故障。
+      let got = null;
+      let lastErr = '';
+      const tryOnce = async () => {
+        const list2 = list;
+        for (const cand of list2.slice(0, 5)) {
+          let r = null;
+          try {
+            r = await a.resolveUrl(cand);
+          } catch (e) {
+            lastErr = e.message;
+            continue;
+          }
+          if (r && r.ok) return { cand, r };
+          lastErr = (r && (r.error || r.qualityLabel)) || '';
+        }
+        return null;
+      };
+      got = await tryOnce();
+      if (!got && /fetch failed|ECONNREFUSED|socket hang up/i.test(lastErr)) {
+        console.log('     （' + key + ' 遇到瞬时网络错误「' + lastErr + '」，1.5 秒后重试一次）');
+        await new Promise((r) => setTimeout(r, 1500));
+        got = await tryOnce();
+      }
+      ok(
+        key + ' 榜单可播放（试前 5 首）',
+        Boolean(got),
+        got
+          ? got.cand.name + ' → ' + (got.r.qualityLabel || got.r.quality || '可播放')
+          : '前 5 首都取不到直链' + (lastErr ? '（最后错误：' + lastErr + '）' : '')
+      );
     }
   }
 

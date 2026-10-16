@@ -41,6 +41,11 @@ class PlatformSupervisor {
     }
     try {
       process.env.PORT = String(port);
+      // 注意：网易云那边的临时目录由 Netease-Api/serve.js 自己负责设置
+      // （它必须在加载 api 包之前就把 TMP 指到 core/tmp，否则包里 util/request.js
+      //   会把公钥路径缓存成系统 temp，首启就报 xeapi public key is missing）。
+      // 这里不要重复设置，避免两处逻辑不一致。
+      //
       // serve.js 直接监听端口，不阻塞主流程
       require(servePath);
       this.status[key] = { state: 'running', port, mode: 'in-process' };

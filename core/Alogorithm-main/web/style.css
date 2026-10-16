@@ -515,3 +515,70 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; }
   .now-side .mini { flex: 1; }
   .cover { width: 96px; height: 96px; }
 }
+
+/* ---------------- 小窗（窄屏）适配 ----------------
+ *
+ * 关键问题：`.columns` 在桌面端有固定高度
+ *     height: min(680px, calc(100vh - 190px))
+ * 三列并排时这样正好「撑满一屏、各自内部滚轮」。
+ * 但 1180px 以下三列会**堆成一列**，这个 680px 仍然生效：
+ * 一个固定高的网格里塞三张卡片，行高被压缩，卡片就会**溢出自己的行**，
+ * 于是歌词卡和弹幕卡叠在一起、按钮压按钮。
+ *
+ * 所以堆成一列后必须把固定高度去掉，改回由内容撑高；
+ * 每个卡片内部本来就是 overflow:auto 的滚动区，给个 vh 上限即可保持滚轮。
+ */
+@media (max-width: 1180px) {
+  .columns {
+    height: auto;
+    min-height: 0;
+  }
+  .col-left,
+  .col-mid,
+  .side {
+    height: auto;
+    min-height: 0;
+  }
+  .col-mid .lyrics-card {
+    height: auto;
+    flex: 0 0 auto;
+    min-height: 0;
+    max-height: 45vh;
+  }
+  .col-left .chat-card {
+    flex: 0 0 auto;
+    min-height: 0;
+    max-height: 40vh;
+  }
+  .col-mid .queue-card {
+    flex: 0 0 auto;
+    min-height: 0;
+    max-height: 60vh;
+  }
+  /* 滚动区自己有 overflow:auto，父级给上限就够了 */
+  .col-left .chat-card .scroll-area,
+  .col-mid .lyrics-card .lyrics-scroll,
+  .col-mid .queue-card .queue-scroll {
+    max-height: 40vh;
+  }
+}
+
+@media (max-width: 820px) {
+  /* 并排的小卡片在窄屏容易顶出去，允许换行 */
+  .now-side { flex-wrap: wrap; }
+  .now-side .mini { flex: 1 1 120px; }
+  .topbar { flex-wrap: wrap; }
+}
+
+@media (max-width: 560px) {
+  .topbar-right { width: 100%; }
+  .brand { flex-wrap: wrap; }
+  .card-head { flex-wrap: wrap; }
+  .card-actions { flex-wrap: wrap; }
+  /* minmax(320px) 在更窄的窗口里会顶破容器 */
+  .switches { grid-template-columns: 1fr; }
+  .now-title h2 { font-size: 19px; }
+  .now { padding: 16px; }
+  .cover { width: 76px; height: 76px; }
+  .app { padding: 16px 14px 30px; }
+}

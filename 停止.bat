@@ -2,12 +2,28 @@
 title DianGeJi - Stop
 cd /d "%~dp0"
 
+
+rem --- BUNDLED_NODE_DETECT: prefer the bundled Node, fall back to system Node ---
+set "NODE_BIN="
+set "NODE_SRC="
+if exist "core\node\node.exe" set "NODE_BIN=core\node\node.exe"
+if not defined NODE_BIN if exist "node\node.exe" set "NODE_BIN=node\node.exe"
+if defined NODE_BIN set "NODE_SRC=bundled"
+if not defined NODE_BIN (
+  where node >nul 2>nul
+  if not errorlevel 1 (
+    set "NODE_BIN=node"
+    set "NODE_SRC=system"
+  )
+)
+
 echo Stopping DanMu DianGeJi and all child processes ...
 echo.
 
 if not exist "core\Alogorithm-main\tools\stop-all.js" goto NOSCRIPT
 
-node "core\Alogorithm-main\tools\stop-all.js"
+if not defined NODE_BIN goto NONODE_SOFT
+"%NODE_BIN%" "core\Alogorithm-main\tools\stop-all.js"
 if errorlevel 1 goto FALLBACK
 
 echo.
@@ -33,3 +49,7 @@ echo         Make sure the "core" folder is next to this script.
 echo.
 pause
 exit /b 1
+
+:NONODE_SOFT
+echo [WARN] Node.js runtime not found; skipping this step.
+echo.

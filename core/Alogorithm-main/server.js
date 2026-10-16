@@ -100,14 +100,31 @@ async function boot() {
   const url = 'http://' + (host === '0.0.0.0' ? '127.0.0.1' : host) + ':' + port;
   logger.info('Web UI 已启动：' + url);
 
-  if (config.server && config.server.openBrowser) openBrowser(url);
-
   // ---------------- B 站弹幕 ----------------
+  // 放在开浏览器之前并 await：attachDanmaku 里会解析房间号、连弹幕服务器。
+  // 先连好再开页面，用户打开时「弹幕」那一栏就已经是正确状态，
+  // 不用等几秒看着它从「未连接」自己变过去。
   auth = new BiliAuth(logger);
-  attachDanmaku();
+  try {
+    await attachDanmaku();
+  } catch (e) {
+    logger.warn('弹幕接入失败（不影响其它功能）：' + e.message);
+  }
 
   logger.info('=== 启动完成，等待点歌 ===');
   engine.broadcast();
+
+  // ---------------- 自动打开 Web UI ----------------
+  // 放在真正「启动完成」之后：四个平台 API 已就绪、弹幕已接入，
+  // 这样浏览器一打开就是可用状态。可在 config.json 用 server.openBrowser 关掉。
+  const wantsBrowser = !config.server || config.server.openBrowser !== false;
+  if (wantsBrowser) {
+    // 让页面里的 WebSocket 先连上，避免首屏闪一下「未连接」
+    setTimeout(() => {
+      logger.info('自动打开 Web UI：' + url);
+      openBrowser(url);
+    }, 600);
+  }
 }
 
 function withPlatforms(snap) {
@@ -243,6 +260,63 @@ function serveStatic(res, relPath, type) {
   res.end(body);
 }
 
+/**
+ * OBS 歌词层的固定短链接（/obs-lytric）默认样式。
+ *
+ * 这些值就是之前那条长链接里的参数，改成短链接后行为完全一致；
+ * 用户仍可用查询参数覆盖任意一项（例如 /obs-lytric?sizeCur=14）。
+ */
+const OBS_LYRIC_DEFAULTS = {
+  cur: 'ff8fb1',
+  other: 'c9a7ff',
+  sizeCur: '4',
+  sizeOther: '2',
+  mode: 'two',
+  halign: 'center',
+  valign: 'middle',
+  glow: '1',
+  song: '1',
+  showMeta: '1',
+  waiting: '1',
+};
+
+/**
+ * 返回 OBS 歌词页，并把默认参数拼进 URL。
+ * 具体样式由 obs-lyrics.html 里那段脚本读 location.search 决定，
+ * 所以这里只要保证地址栏带上参数即可，页面本身不用改多套逻辑。
+ */
+function serveObsLyrics(res, url) {
+  const file = path.join(WEB_DIR, 'obs-lyrics.html');
+  if (!fs.existsSync(file)) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('404');
+    return;
+  }
+  // 用户显式传了的参数优先，没传的用默认值补齐
+  const q = new URLSearchParams();
+  for (const [k, v] of Object.entries(OBS_LYRIC_DEFAULTS)) {
+    q.set(k, url.searchParams.has(k) ? url.searchParams.get(k) : v);
+  }
+  // 允许透传额外参数（例如自定义 css）
+  for (const [k, v] of url.searchParams) {
+    if (!q.has(k)) q.set(k, v);
+  }
+  const html = fs.readFileSync(file, 'utf8');
+  // 在 <head> 最前面插入一次跳转，把默认参数带到真正的地址上；
+  // 用 replaceState 不会产生历史记录，也不会闪屏。
+  const snippet =
+    '<script>(function(){var d=' +
+    JSON.stringify(q.toString()) +
+    ';try{history.replaceState(null,"",location.pathname+"?"+d);}catch(e){location.replace(location.pathname+"?"+d);}})();</script>';
+  const body = Buffer.from(html.replace(/<head>/i, '<head>' + snippet), 'utf8');
+  res.writeHead(200, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Content-Length': body.length,
+    'Cache-Control': 'no-store',
+  });
+  res.end(body);
+}
+
 async function handleHttp(req, res) {
   const url = new URL(req.url, 'http://' + (req.headers.host || '127.0.0.1'));
   const p = url.pathname.replace(/\/+$/, '') || '/';
@@ -261,6 +335,10 @@ async function handleHttp(req, res) {
   if (p === '/app.js') return serveStatic(res, 'app.js', 'application/javascript');
   if (p === '/style.css') return serveStatic(res, 'style.css', 'text/css');
   if (p === '/obs') return serveStatic(res, 'obs.html', 'text/html');
+  // 独立的 OBS 歌词层。/obs-lytric 是给 OBS 用的**固定短链接**（不带一长串参数），
+  // 默认样式写死在这；如果用户想临时改，仍然可以在后面接 ?cur=&mode= 这类参数覆盖。
+  // /obs-lyrics 保留，避免已经填进 OBS 的旧链接失效。
+  if (p === '/obs-lytric') return serveObsLyrics(res, url);
   if (p === '/obs-lyrics' || p === '/obs/lyrics') return serveStatic(res, 'obs-lyrics.html', 'text/html');
 
   if (!engine) return sendJson(res, { ok: false, error: '引擎尚未就绪' }, 503);
@@ -1016,12 +1094,37 @@ async function diagnostics() {
   return out;
 }
 
+/**
+ * 打开系统默认浏览器访问 Web UI。
+ *
+ * 依次尝试几种方式，任意一种成功即可（不同环境下 start / explorer 的可用性不一样）：
+ *   1) cmd /c start "" <url>   —— 最通用
+ *   2) explorer.exe <url>      —— start 被策略挡住时常用它兜底
+ *   3) rundll32 url.dll        —— 再兜一层
+ *
+ * 注意：不阻塞启动流程，回调里也不抛错；失败只打一行警告。
+ */
 function openBrowser(url) {
-  try {
-    execFile('cmd', ['/c', 'start', '', url], { windowsHide: true }, () => {});
-  } catch {
-    /* ignore */
-  }
+  const attempts = [
+    ['cmd', ['/c', 'start', '', url]],
+    ['explorer.exe', [url]],
+    ['rundll32.exe', ['url.dll,FileProtocolHandler', url]],
+  ];
+  const tryNext = (i) => {
+    if (i >= attempts.length) {
+      logger.warn('自动打开浏览器失败，请手动访问 ' + url);
+      return;
+    }
+    const [file, args] = attempts[i];
+    try {
+      execFile(file, args, { windowsHide: true, timeout: 8000 }, (err) => {
+        if (err) tryNext(i + 1);
+      });
+    } catch {
+      tryNext(i + 1);
+    }
+  };
+  tryNext(0);
 }
 
 async function shutdown(why) {

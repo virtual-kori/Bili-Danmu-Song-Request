@@ -551,30 +551,14 @@
   // ---------------------------------------------------------------- OBS 歌词链接
 
   /**
-   * 生成带样式的 OBS 歌词链接。
+   * OBS 歌词层地址。
    *
-   * 注意：OBS 里的字号必须用 vh 才能跟着浏览器源高度缩放，
-   * 而且直播画面的字要比网页里大得多（网页 15px 换算成 vh 后在 OBS 里只有 27px，
-   * 根本看不清）。所以这里用**独立的一组 OBS 字号**，默认 11vh / 4.5vh，
-   * 不复用网页面板的像素字号。
+   * 用**固定短链接** /obs-lytric：之前那种「颜色+字号+对齐+自定义 CSS 全塞进 URL」
+   * 的写法又长又难念，在 OBS 里核对/手输都很痛苦。
+   * 默认样式写在服务端（OBS_LYRIC_DEFAULTS），网页里的样式面板只影响网页内预览。
    */
   function obsLyricUrl() {
-    var q = new URLSearchParams();
-    q.set('cur', lyricCfg.cur.replace('#', ''));
-    q.set('other', lyricCfg.other.replace('#', ''));
-    q.set('sizeCur', String(lyricCfg.obsSizeCur || 11));
-    q.set('sizeOther', String(lyricCfg.obsSizeOther || 4.5));
-    q.set('mode', lyricCfg.mode || 'scroll');
-    q.set('halign', lyricCfg.halign || 'center');
-    q.set('valign', lyricCfg.valign || 'bottom');
-    if (lyricCfg.glow) q.set('glow', '1');
-    if ($('inObsSong') && $('inObsSong').checked) q.set('song', '1');
-    if ($('inObsMeta') && $('inObsMeta').checked) q.set('showMeta', '1');
-    if ($('inObsWaiting') && $('inObsWaiting').checked) q.set('waiting', '1');
-    // 自定义 CSS 放进 URL（OBS 读不到本地文件，只能这样传）
-    var css = String(lyricCfg.obsCss || '').trim();
-    if (css) q.set('css', css);
-    return location.origin + '/obs-lyrics?' + q.toString();
+    return location.origin + '/obs-lytric';
   }
 
   function refreshObsUrl() {

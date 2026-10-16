@@ -252,10 +252,19 @@ class LiveDanmakuClient extends EventEmitter {
     ws.on('error', (e) => this.log('连接错误：' + e.message));
 
     // 认证包（建连后 5 秒内必须发送）
-    // 注意 uid 一致性：若填了自己的 mid，必须与申请 token 时所用 Cookie 的登录用户一致，
-    // 否则会被强制断开；未登录/不确定时一律填 0。
+    //
+    // uid 必须与**申请 token 时的身份**一致，否则服务端不返回鉴权结果、
+    // 直接把连接关掉（表现为「连上了但一条弹幕都收不到，2 秒后重连」）。
+    //
+    // 实测（2026-10，热门房间 5271）：
+    //   · 首选路径 room/v1/Danmu/getConf 是**匿名**接口，拿到的是匿名 token；
+    //     此时发送 uid=0 → 立刻收到 AUTH_REPLY(op=8)，连接稳定，能收弹幕；
+    //     发送登录 uid（即使请求时带着同一份登录 Cookie）→ 服务端立即 close，收不到任何帧。
+    //   · 取弹幕不需要登录：昵称/uid 是弹幕消息里自带的，与自己用什么 uid 建连无关。
+    //
+    // 所以这里**固定发 0**。等哪天改成「带登录态申请 token 并校验 uid 一致」再放开。
     const authBody = {
-      uid: this.auth.loggedIn && this.auth.selfUid ? this.auth.selfUid : 0,
+      uid: 0,
       roomid: this.roomId,
       protover: 3,
       platform: 'web',
