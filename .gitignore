@@ -15,10 +15,22 @@ __pycache__/
 # ==== 运行期数据与日志 ====
 /core/Alogorithm-main/logs/
 *.log
+# 平台登录凭据（各平台登录后写入，含 cookie / token）
+/core/kuwoMusicApi/live/data/
+/core/QQMusicApi/live/data/
 
 # ==== 旧版本残留 ====
 # 程序已不再读取（主配置入口是根目录 config.json，见 core/Alogorithm-main/core/config.js）
 /core/Alogorithm-main/config.json
+# 与 core/platform-ports.json 内容完全重复，程序只读那份（见 core/Alogorithm-main/core/config.js）
+/core/Alogorithm-main/platform-ports.json
+
+# ==== 上游第三方项目的仓库元数据（与本项目无关，不随包分发）====
+/core/KuGouMusicApi/.github/
+/core/QQMusicApi/.github/
+/core/QQMusicApi/.agents/
+/core/kuwoMusicApi/.github/
+/core/kuwoMusicApi/.vscode/
 
 # ==== 系统与编辑器杂物 ====
 Thumbs.db

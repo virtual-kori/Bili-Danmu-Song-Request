@@ -127,8 +127,10 @@ console.log('\n=== 3) 挪到完全不同的目录（含空格与中文），用�
   fs.rmSync(path.dirname(probe), { recursive: true, force: true });
   fs.mkdirSync(path.dirname(probe), { recursive: true });
 
-  // 只复制启动必需的部分，够验证「相对路径可跑」即可
-  for (const n of ['启动.bat', '停止.bat', 'config.json']) {
+  // 只复制启动必需的部分，够验证「相对路径可跑」即可。
+  // 注意：根目录的 bat 要**全部**带上（启动/停止/重置），
+  // 否则副本里根 bat 数量对不上，check-paths 会误报（踩过）。
+  for (const n of ['启动.bat', '停止.bat', '重置.bat', 'config.json']) {
     const s = path.join(ROOT, n);
     if (fs.existsSync(s)) fs.cpSync(s, path.join(probe, n), { recursive: true });
   }

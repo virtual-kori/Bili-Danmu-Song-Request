@@ -919,6 +919,7 @@ async function accountsSnapshot() {
       let playable = false;
       let loggedIn = false;
       let user = '';
+      let vip = false;
       let quality = '';
       let note = '';
       try {
@@ -927,6 +928,7 @@ async function accountsSnapshot() {
         online = playable || Boolean(ping && ping.error && !/未运行|ECONNREFUSED|fetch failed/i.test(ping.error));
         loggedIn = Boolean(ping && ping.loggedIn);
         user = (ping && ping.user) || '';
+        vip = Boolean(ping && ping.vip);
         quality = (ping && ping.quality) || '';
         note = (ping && ping.error) || '';
       } catch (e) {
@@ -971,7 +973,10 @@ async function accountsSnapshot() {
         loggedIn,
         loginDisabled: Boolean(meta.loginDisabled),
         qrKind: meta.qrKind || 'platform',
-        user,
+        // 账号名：能拿到真实用户名就显示用户名，拿不到就是空（前端只显示「已登录」）
+        account: loggedIn ? String(user || '') : '',
+        user: String(user || ''),
+        vip,
         quality,
         note,
         qr: meta.qr && !meta.loginDisabled,
@@ -998,6 +1003,7 @@ async function accountsSnapshot() {
       label: '哔哩哔哩（弹幕来源）',
       loggedIn: bili.loggedIn,
       user: bili.uname || '',
+      account: bili.loggedIn ? String(bili.uname || '') : '',
       uid: bili.uid || 0,
       note: bili.loggedIn ? '已登录（可显示点歌人昵称、可回复弹幕）' : '未登录（B 站会把昵称打码成 *，且无法回复弹幕）',
       qr: true,

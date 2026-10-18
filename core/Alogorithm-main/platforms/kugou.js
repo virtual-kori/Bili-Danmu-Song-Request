@@ -67,19 +67,23 @@ class KugouAdapter {
     const hasUser = /(^|;\s*)userid=/.test(cookie);
     const loggedIn = hasToken && hasUser;
 
+    // 酷狗拿不到昵称，但 Cookie 里有 userid，就把它当账号名显示。
+    const uidMatch = /(?:^|;\s*)userid=([^;]+)/.exec(cookie);
+    const accountName = loggedIn && uidMatch ? uidMatch[1].trim() : '';
+
     try {
       const list = await this.search('周杰伦', 5);
-      if (!list.length) return { ok: false, loggedIn, user: '', error: '搜索无结果（酷狗接口可能已变动）' };
+      if (!list.length) return { ok: false, loggedIn, user: accountName, error: '搜索无结果（酷狗接口可能已变动）' };
       for (const cand of list.slice(0, 3)) {
         const r = await this.resolveUrl(cand);
         if (r && r.ok && r.url) {
-          return { ok: true, loggedIn, user: loggedIn ? '已登录' : '', quality: r.qualityLabel || r.quality, error: '' };
+          return { ok: true, loggedIn, user: accountName, quality: r.qualityLabel || r.quality, error: '' };
         }
       }
       return {
         ok: false,
         loggedIn,
-        user: loggedIn ? '已登录' : '',
+        user: accountName,
         error: loggedIn ? '已登录但取不到直链（该曲可能需付费）' : '未登录：热门/付费曲取不到直链',
       };
     } catch (e) {

@@ -140,20 +140,41 @@ class KuwoAdapter {
     return isLoggedInCookie(cookie);
   }
 
+  /** 读本地酷我服务里的昵称（微信扫码登录会带上，手动粘贴的 Cookie 通常没有） */
+  async fetchNickname() {
+    try {
+      const info = await getLocalJson(this.base, '/login/status', { timestamp: Date.now() }, { timeoutMs: 4000 });
+      const d = (info && info.data) || info || {};
+      if (d && typeof d.nickname === 'string' && d.nickname.trim()) return d.nickname.trim();
+    } catch {
+      /* 拿不到就算了 */
+    }
+    return '';
+  }
+
   async ping() {
     // 登录态看 Cookie 里有没有登录凭证；可用性看能否真的取到直链
     const cookie = this.cookie || '';
     const loggedIn = this.isLoggedInCookie(cookie);
+    // 账号名：优先昵称，没有昵称就用 Cookie 里的 userid
+    let accountName = '';
+    if (loggedIn) {
+      accountName = await this.fetchNickname();
+      if (!accountName) {
+        const m = /(?:^|;\s*)userid=([^;]+)/.exec(cookie);
+        accountName = m ? m[1].trim() : '';
+      }
+    }
     try {
       const list = await this.search('周杰伦', 5);
-      if (!list.length) return { ok: false, loggedIn, user: '', error: this.lastError || '搜索无结果' };
+      if (!list.length) return { ok: false, loggedIn, user: accountName, error: this.lastError || '搜索无结果' };
       for (const cand of list.slice(0, 3)) {
         const u = await this.resolveUrl(cand);
         if (u && u.ok && u.url) {
-          return { ok: true, loggedIn, user: loggedIn ? '已登录' : '', quality: u.qualityLabel || u.quality, error: '' };
+          return { ok: true, loggedIn, user: accountName, quality: u.qualityLabel || u.quality, error: '' };
         }
       }
-      return { ok: false, loggedIn, user: loggedIn ? '已登录' : '', error: '取不到可用播放地址' };
+      return { ok: false, loggedIn, user: accountName, error: '取不到可用播放地址' };
     } catch (e) {
       return { ok: false, loggedIn, user: '', error: e.message };
     }

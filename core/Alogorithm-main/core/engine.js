@@ -879,7 +879,7 @@ class Engine extends EventEmitter {
     }
   }
 
-  /** 拉取推荐曲：lastPlayed / playlist / recommend */
+  /** 拉取推荐曲：lastPlayed / playlist / roam / recommend */
   async fetchIdleSongs(cfg, count) {
     const priority = (this.config.platforms && this.config.platforms.priority) || ['netease'];
     const enabled = (this.config.platforms && this.config.platforms.enabled) || {};
@@ -900,6 +900,29 @@ class Engine extends EventEmitter {
         const list = await adapter.playlistSongs(cfg.playlistId, count);
         if (list.length) return list;
       }
+      return this.fetchPlatformRecommend(priority, enabled, count);
+    }
+
+    // 漫游（私人FM）：按平台优先级找第一个支持的平台。
+    // 目前只有网易云实现了 roamSongs；它未登录 / 被限流时会抛错或返回空，
+    // 这时**退化为榜单推荐**，保证空闲时不会没歌可放。
+    if (cfg.source === 'roam') {
+      for (const p of priority) {
+        if (enabled[p] === false) continue;
+        const adapter = this.adapters[p];
+        if (!adapter || typeof adapter.roamSongs !== 'function') continue;
+        try {
+          const list = await adapter.roamSongs(count);
+          if (list && list.length) {
+            logger.info('空闲漫游：' + p + ' 取到 ' + list.length + ' 首');
+            return list;
+          }
+          logger.debug('空闲漫游：' + p + ' 返回空，换下一个平台或榜单');
+        } catch (e) {
+          logger.warn('空闲漫游 ' + p + ' 失败：' + e.message + '，退化为榜单');
+        }
+      }
+      logger.info('空闲漫游没有取到歌，退化为榜单推荐');
       return this.fetchPlatformRecommend(priority, enabled, count);
     }
 

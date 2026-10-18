@@ -99,11 +99,11 @@ async function pickLiveRoom() {
 
 (async () => {
   console.log('【1】目录结构');
-  // 根目录只留「启动/停止 + config.json + core」，登录脚本统一收在 core/ 里。
+  // 根目录只留「启动/停止/重置 + config.json + core」，登录脚本统一收在 core/ 里。
   // node/ 与 runtime/ 是旧版运行时位置（仍兼容）；标准位置已改到 core/node 与 core/python。
   const root = fs.readdirSync(dir).filter((n) => !/^_/.test(n) && n !== 'node' && n !== 'runtime').sort();
-  const wantRoot = ['config.json', 'core', '停止.bat', '启动.bat'].sort();
-  ok('根目录 = 启动/停止 bat + config.json + core', JSON.stringify(root) === JSON.stringify(wantRoot), root.join(' , '));
+  const wantRoot = ['config.json', 'core', '停止.bat', '启动.bat', '重置.bat'].sort();
+  ok('根目录 = 启动/停止/重置 bat + config.json + core', JSON.stringify(root) === JSON.stringify(wantRoot), root.join(' , '));
   // 前置运行时（统一放 core/ 里）
   for (const [label, rel, arg] of [
     ['自带 Node 运行时可用', 'core\\node\\node.exe', '--version'],
@@ -171,6 +171,19 @@ async function pickLiveRoom() {
     );
   });
   ok('每个账号都有登录态与可用性字段', structOk, list.map((a) => a.key + '=' + (a.loginDisabled ? '无需登录' : a.loggedIn ? '已登录' : '未登录')).join(' '));
+
+  // 登录中心要显示账号名（仅用户名）。字段必须存在；已登录时尽力给出名字。
+  const hasAccountField = list.every((a) => typeof a.account === 'string');
+  ok('账号项都带 account 字段（供登录中心显示账号名）', hasAccountField, '');
+  const logged = list.filter((a) => a.loggedIn);
+  const named = logged.filter((a) => a.account && a.account.length > 0);
+  ok(
+    '已登录的账号能给出用户名',
+    logged.length === 0 || named.length > 0,
+    logged.length
+      ? logged.map((a) => a.key + '=' + (a.account || '（无）')).join(' ')
+      : '（当前没有已登录账号，跳过）'
+  );
   const kuwo = (acc.data.platforms || []).find((p) => p.key === 'kuwo') || {};
   const qq = (acc.data.platforms || []).find((p) => p.key === 'qq') || {};
   const qwx = await api('/api/login/qq/qr?kind=wx', 'POST', {});
@@ -234,6 +247,9 @@ async function pickLiveRoom() {
     ['小窗 UI（320-1440px 无重叠 / 无溢出 / 无越界）', 'check-ui-small.js'],
     ['OBS 歌词短链接（默认样式 / 参数覆盖 / 旧链接兼容）', 'check-obs-lytric.js'],
     ['自动启动（开浏览器 / 首启无 EPERM 与 xeapi 报错）', 'check-autostart.js'],
+    ['弹幕服务器自动选点（按实测延迟挑最近的）', 'check-danmaku-host.js'],
+    ['登录态下弹幕仍可连（鉴权 uid 必须固定 0）', 'check-danmaku-login.js'],
+    ['空闲漫游（网易云私人FM 随机推歌 + 退化榜单）', 'check-roam.js'],
   ]) {
     const r = runTest(rel);
     ok(label, r.failed === 0, r.summary + (r.failed ? '（' + r.bad.join(' | ').slice(0, 100) + '）' : ''));
@@ -241,13 +257,15 @@ async function pickLiveRoom() {
 
   // 空闲选曲要真的跑一会儿（等它补歌/切歌），放最后单独跑。
   //
-  // 注意：前面几项会反复拉起无头浏览器，本机负载高时四个平台子进程偶尔会
-  // 冒一次 "fetch failed"（实测单独跑稳定 16/16）。这里失败就等一会儿重试一次，
-  // 避免把「机器忙」误报成功能故障。
+  // 这一项失败基本都是**外部原因**，不是功能坏了：
+  //   ① 前面几项反复拉起无头浏览器，本机负载高时平台子进程偶尔冒 "fetch failed"；
+  //   ② 网易云风控按 IP 判定，频繁测试会触发 code=405，适配器内有 90 秒冷却，
+  //      冷却期间榜单返回 0 首。
+  // 两种情况都会自己恢复，所以失败就等一会儿重试一次（不猜错误文案）。
   let idle = runTest('check-idle-pick.js');
   if (idle.failed > 0) {
-    console.log('   空闲选曲有失败项，等 8 秒重试一次… ' + idle.bad.join(' | ').slice(0, 80));
-    await sleep(8000);
+    console.log('   空闲选曲有失败项，等 30 秒重试一次（多为限流或机器忙）… ' + idle.bad.join(' | ').slice(0, 70));
+    await sleep(30000);
     idle = runTest('check-idle-pick.js');
   }
   ok('空闲选曲（榜单 / 开播即出队 / 跳过最近播放）', idle.failed === 0, idle.summary + (idle.failed ? '（' + idle.bad.join(' | ').slice(0, 100) + '）' : ''));

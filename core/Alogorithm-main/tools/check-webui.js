@@ -100,8 +100,8 @@ function get(p) {
   // node/ 是旧版自带运行时位置（仍兼容）；标准位置已改到 core/node 与 core/python
   const rootFiles = fs.readdirSync(rootDir).filter((n) => !/^_/.test(n) && n !== 'node' && n !== 'runtime').sort();
   ok(
-    '根目录只留启动/停止与 config.json（+ 可选 node/、runtime/）',
-    JSON.stringify(rootFiles) === JSON.stringify(['config.json', 'core', '停止.bat', '启动.bat'].sort()),
+    '根目录只留启动/停止/重置与 config.json（+ 可选 node/、runtime/）',
+    JSON.stringify(rootFiles) === JSON.stringify(['config.json', 'core', '停止.bat', '启动.bat', '重置.bat'].sort()),
     rootFiles.join(' , ')
   );
   const coreBats = fs.readdirSync(path.join(rootDir, 'core')).filter((n) => n.endsWith('.bat')).sort();

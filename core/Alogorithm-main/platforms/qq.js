@@ -23,15 +23,19 @@ class QQAdapter {
     try {
       const r = await getLocalJson(this.base, '/login/status', {}, { timeoutMs: 4000 });
       const loggedIn = Boolean(r && r.loggedIn);
+      // QQ 音乐本地服务只给得到 musicid（数字音乐号），拿不到昵称。
+      // 这里如实给出音乐号，UI 上显示成「账号：<musicid>」，
+      // 比原来一律「已登录」有信息量。
+      const accountName = loggedIn && r && r.musicid ? String(r.musicid) : '';
       const list = await this.search('周杰伦', 5);
-      if (!list.length) return { ok: false, loggedIn, user: '', error: '搜索无结果（QQ 接口可能已变动）' };
+      if (!list.length) return { ok: false, loggedIn, user: accountName, error: '搜索无结果（QQ 接口可能已变动）' };
       for (const cand of list.slice(0, 3)) {
         const u = await this.resolveUrl(cand);
         if (u && u.ok && u.url) {
           return {
             ok: true,
             loggedIn,
-            user: loggedIn ? String(r.musicid || '已登录') : '',
+            user: accountName,
             quality: u.qualityLabel || u.quality,
             error: '',
           };
@@ -40,7 +44,7 @@ class QQAdapter {
       return {
         ok: false,
         loggedIn,
-        user: loggedIn ? '已登录' : '',
+        user: accountName,
         error: loggedIn ? '已登录但取不到直链（该曲可能需付费）' : '未登录：VIP 曲目取不到直链',
       };
     } catch (e) {

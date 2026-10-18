@@ -51,10 +51,23 @@ function mpvCount() {
 
   await sleep(3500);
   let st = (await get('/api/state')).data;
-  ok('点歌后只入队不插队播放（当前播放为第一首）', st.current && st.current.name === '晴天', '当前=' + (st.current && st.current.name) + '，队列=' + st.queue.map((q) => q.name).join('/'));
+
+  // 用「平台 + 歌曲ID」做标识，而不是歌名精确相等 ——
+  // 搜索会匹配到各种 Cover/翻唱版本（例如点「晴天」可能匹配到「晴天(深情版)」），
+  // 用歌名比较会误报（踩过）。这里只关心「当前播的还是不是第一首点的那首」。
+  const keyOf = (x) => (x ? String(x.platform || '') + '::' + String(x.songId || x.id || x.name) : '');
+  const firstKey = o1.ok ? keyOf(o1.matched) : '';
+  const laterKeys = [o2, o3].filter((o) => o.ok).map((o) => keyOf(o.matched));
+  const curKey = keyOf(st.current);
+
+  ok(
+    '点歌后只入队不插队播放（当前播放仍是第一首）',
+    Boolean(st.current) && curKey === firstKey && !laterKeys.includes(curKey),
+    '当前=' + (st.current && st.current.name) + '(' + (st.current && st.current.platform) + ')，第一首=' + (o1.ok ? o1.matched.name : '?')
+  );
   ok(
     '开始播放的那首已从未播放队列出队',
-    st.current && st.queue.every((q) => q.name !== st.current.name) && st.queue.length === 2,
+    Boolean(st.current) && st.queue.every((q) => keyOf(q) !== curKey) && st.queue.length === 2,
     '队列 ' + st.queue.map((q) => q.name).join('/') + '（应为后点的两首）'
   );
   ok('MPV 进程唯一（不残留）', mpvCount() === 1, 'mpv 进程数=' + mpvCount());

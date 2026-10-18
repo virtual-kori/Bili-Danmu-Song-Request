@@ -18,7 +18,7 @@ if not defined NODE_BIN (
 )
 
 echo ============================================================
-echo            DanMu DianGeJi  v1.0.2  Launcher
+echo            DanMu DianGeJi  v0.1.2  Launcher
 echo ============================================================
 echo.
 if not exist "core\Alogorithm-main\server.js" goto NOFILES

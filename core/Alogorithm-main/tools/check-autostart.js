@@ -67,7 +67,17 @@ console.log('\n=== 2) 网易云首启不再刷错：代码层面 ===');
     ''
   );
   ok('会预取 xeapi 公钥', /ensureXeapiKey/.test(serve), '');
-  ok('过滤了首启那句已知无害报错', /xeapi public key is missing/i.test(serve) && /withQuietXeapiError/.test(serve), '');
+  ok('过滤了首启那句已知无害报错', /xeapi public key is missing/i.test(serve) && /withQuietUpstreamNoise/.test(serve), '');
+  ok(
+    '一并隐藏了假 IP 那行（容易被误读成真实 IP）',
+    /Generated Random Chinese IP/i.test(serve),
+    '只隐藏日志，不改 global.cnIp 本身'
+  );
+  ok(
+    '过滤覆盖 console.info（上游多数日志走的是它）',
+    /console:\s*\{[\s\S]{0,80}info:/.test(serve) || /console\.info/.test(serve),
+    'util/logger.js 用的是 console.info'
+  );
 }
 
 console.log('\n=== 3) 临时目录确实可写且落在项目内 ===');

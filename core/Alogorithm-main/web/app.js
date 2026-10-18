@@ -730,6 +730,7 @@
       '<span class="nm">哔哩哔哩（弹幕来源）</span>' +
       '<span class="st ' + (bili.loggedIn ? 'on' : 'off') + '">' + (bili.loggedIn ? '已登录' : '未登录') + '</span>' +
       '</div>' +
+      (bili.loggedIn && bili.account ? '<div class="pacc" title="当前登录账号">账号：' + esc(bili.account) + '</div>' : '') +
       '<div class="pacts">' +
       '<button class="btn small primary" data-login="bilibili">' + (bili.loggedIn ? '重新登录' : 'B 站登录') + '</button>' +
       '</div>' +
@@ -758,6 +759,9 @@
         '<span class="nm">' + esc(labels[key] || key) + '</span>' +
         '<span class="st ' + stCls + '">' + stText + '</span>' +
         '</div>' +
+        (a.loggedIn && a.account
+          ? '<div class="pacc" title="当前登录账号">账号：' + esc(a.account) + (a.vip ? '（VIP）' : '') + '</div>'
+          : '') +
         '<div class="pacts">' +
         '<button class="btn small" data-prio="' + key + '" data-dir="-1" ' + (i === 0 ? 'disabled' : '') + '>上移</button>' +
         '<button class="btn small" data-prio="' + key + '" data-dir="1" ' + (i === order.length - 1 ? 'disabled' : '') + '>下移</button>' +
@@ -1213,6 +1217,8 @@
     var kvs = [];
     if (a.port) kvs.push('本地端口 ' + a.port);
     if (a.online !== undefined) kvs.push(a.online ? 'API 服务在线' : 'API 服务未运行');
+    // 账号名放最前面，一眼能看到「现在登的是谁」
+    if (a.loggedIn && a.account) kvs.unshift('账号 ' + a.account + (a.vip ? '（VIP）' : ''));
     if (a.uid) kvs.push('uid ' + a.uid);
     if (a.cookieMask) kvs.push('Cookie ' + a.cookieMask);
     if (a.dmState) kvs.push('弹幕连接 ' + a.dmState);

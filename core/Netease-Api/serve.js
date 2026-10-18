@@ -99,34 +99,50 @@ async function ensureXeapiKey() {
 }
 
 /**
- * 临时屏蔽上游那段「已知且无害」的报错输出。
+ * 临时屏蔽上游那几段「已知且无害」的噪音输出。
  *
- * 上游的循环依赖：generateConfig 先调 register_anonimous()（走 xeapi 通道、需要公钥），
- * 之后才去取公钥。而 util/request.js 在**模块加载时**就把公钥读进内存并缓存为 null，
- * 之后再写文件也不会重新读 —— 所以「首次运行」这一次必然抛
- *   Error: xeapi public key is missing
- * 并 console.log 出来，看起来像故障，其实完全不影响服务（网易云照常起、照常搜歌取直链）。
+ * ① xeapi public key is missing
+ *    上游的循环依赖：generateConfig 先调 register_anonimous()（走 xeapi 通道、需要公钥），
+ *    之后才去取公钥。而 util/request.js 在**模块加载时**就把公钥读进内存并缓存为 null，
+ *    之后再写文件也不会重新读 —— 所以「首次运行」这一次必然抛这个错并 console.log 出来。
+ *    看起来像故障，其实完全不影响服务（网易云照常起、照常搜歌取直链）。
  *
- * 做法：临时把 console.log / error / warn 换成会过滤这一句的版本，跑完立刻还原。
+ * ② Generated Random Chinese IP: ...
+ *    上游为了「本机请求带 realIP 参数时不用回环地址」而随机编的一个中国 IP
+ *    （generateConfig 里的 generateRandomChineseIP）。它只是请求体里的一个字段，
+ *    **不改变本机出口 IP**，而且每次启动都重新随机。
+ *    打在启动横幅里很容易被误读成「我的 IP 怎么跑到广州去了」，所以不显示。
+ *
+ * 做法：临时把 console.log / error / warn 换成会过滤这些句子的版本，跑完立刻还原。
  * （直接改 process.stdout.write 会干扰 console 内部实现，所以改在这一层。）
  */
-async function withQuietXeapiError(fn) {
-  const IGNORE = /xeapi public key is missing/i;
-  const orig = { log: console.log, error: console.error, warn: console.warn };
+async function withQuietUpstreamNoise(fn) {
+  const IGNORE = [
+    /xeapi public key is missing/i,
+    /Generated Random Chinese IP/i,
+    // 取公钥/注册匿名 token 时的瞬时网络抖动：这两个文件只是缓存，
+    // 拿不到不影响服务（网易云照常搜索取直链），下次启动会重试。
+    /AxiosError: socket hang up/i,
+  ];
+  // 注意：上游多数日志走的是 console.info（见 util/logger.js），
+  // 只包装 log/error/warn 会漏掉，所以 info/debug 也要一起换。
+  const orig = {
+    log: console.log,
+    info: console.info,
+    debug: console.debug,
+    error: console.error,
+    warn: console.warn,
+  };
   const wrap = (target) => (...args) => {
     const text = args.map((a) => (a && a.stack ? a.stack : String(a))).join(' ');
-    if (IGNORE.test(text)) return;
+    if (IGNORE.some((re) => re.test(text))) return;
     target.apply(console, args);
   };
-  console.log = wrap(orig.log);
-  console.error = wrap(orig.error);
-  console.warn = wrap(orig.warn);
+  for (const k of Object.keys(orig)) console[k] = wrap(orig[k]);
   try {
     return await fn();
   } finally {
-    console.log = orig.log;
-    console.error = orig.error;
-    console.warn = orig.warn;
+    for (const k of Object.keys(orig)) console[k] = orig[k];
   }
 }
 
@@ -148,7 +164,7 @@ async function main() {
   if (!hasToken) {
     try {
       const generateConfig = require(path.join(pkgDir(), 'generateConfig.js'))
-      await withQuietXeapiError(() => generateConfig())
+      await withQuietUpstreamNoise(() => generateConfig())
     } catch (err) {
       console.warn('[warn] 匿名 token 初始化失败（不影响使用）:', (err && err.message) || err)
     }

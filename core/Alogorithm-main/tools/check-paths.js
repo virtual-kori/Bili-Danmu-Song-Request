@@ -107,8 +107,8 @@ const coreDir = path.join(ROOT, 'core');
 const coreBats = fs.existsSync(coreDir) ? fs.readdirSync(coreDir).filter((n) => n.endsWith('.bat')) : [];
 const bats = rootBats.map((n) => [path.join(ROOT, n), true]).concat(coreBats.map((n) => [path.join(coreDir, n), false]));
 
-const wantRootBats = ['停止.bat', '启动.bat'].sort();
-ok('根目录只有启动/停止两个 bat', JSON.stringify(rootBats.sort()) === JSON.stringify(wantRootBats), rootBats.join(' , '));
+const wantRootBats = ['停止.bat', '启动.bat', '重置.bat'].sort();
+ok('根目录只有启动/停止/重置三个 bat', JSON.stringify(rootBats.sort()) === JSON.stringify(wantRootBats), rootBats.join(' , '));
 
 const wantCoreBats = ['登录.bat', '登录QQ音乐.bat', '登录网易云.bat', '登录酷我.bat', '登录酷狗.bat'].sort();
 ok('登录脚本都在 core/ 里', JSON.stringify(coreBats.sort()) === JSON.stringify(wantCoreBats), coreBats.join(' , '));

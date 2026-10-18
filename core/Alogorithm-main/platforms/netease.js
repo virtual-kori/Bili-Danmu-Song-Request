@@ -95,26 +95,29 @@ class NeteaseAdapter {
     try {
       const acc = await this.currentAccount();
       const loggedIn = acc.loggedIn;
+      // user 只放**纯用户名**，VIP 之类的后缀单独给 vip 字段，
+      // 这样 UI 里「账号：xxx」不会被拼上一堆括号说明。
       const user = acc.nickname;
       const vip = acc.vip ? '（VIP）' : '';
 
       const list = await this.search('周杰伦', 5);
       if (!list.length) {
         if (inCooldown()) {
-          return { ok: false, loggedIn, user, error: '网易云限流冷却中（还需 ' + cooldownSeconds() + ' 秒自动恢复）' };
+          return { ok: false, loggedIn, user, vip: acc.vip, error: '网易云限流冷却中（还需 ' + cooldownSeconds() + ' 秒自动恢复）' };
         }
-        return { ok: false, loggedIn, user, error: '搜索无结果（网易云接口可能已变动）' };
+        return { ok: false, loggedIn, user, vip: acc.vip, error: '搜索无结果（网易云接口可能已变动）' };
       }
       for (const cand of list.slice(0, 3)) {
         const u = await this.resolveUrl(cand);
         if (u && u.ok && u.url) {
-          return { ok: true, loggedIn, user: loggedIn ? user + vip : '', quality: u.qualityLabel || u.quality, error: '' };
+          return { ok: true, loggedIn, user: loggedIn ? user : '', vip: acc.vip, quality: u.qualityLabel || u.quality, error: '' };
         }
       }
       return {
         ok: false,
         loggedIn,
-        user: loggedIn ? user + vip : '',
+        user: loggedIn ? user : '',
+        vip: acc.vip,
         error: loggedIn ? '已登录但取不到直链（该曲可能无版权）' : '未登录：VIP 曲目只能试听',
       };
     } catch (e) {
@@ -256,6 +259,65 @@ class NeteaseAdapter {
       }
     }
     return [];
+  }
+
+  /**
+   * 漫游（私人FM）：每次只返回 1 首随机歌，所以连拉几次攒一批。
+   *
+   * 网易云这套接口底层是 /api/v1/radio/get，返回的是**个性化随机**曲目，
+   * 跟榜单完全不同 —— 空闲时想「一直在放没听过的歌」就用它。
+   *
+   * 注意：
+   *   · 一次一首，limit 越大请求越多（实测单次约 250~400ms）；
+   *   · 未登录时经常返回空，这时抛错让上层退化为榜单；
+   *   · 命中限流（405）会抛错，上层据此进入冷却。
+   */
+  async roamSongs(limit = 8) {
+    if (cooldownSeconds() > 0) {
+      throw new Error('网易云限流冷却中（还需 ' + cooldownSeconds() + ' 秒自动恢复）');
+    }
+    const want = Math.max(1, Math.min(20, Number(limit) || 8));
+    const out = [];
+    const seen = Object.create(null);
+
+    for (let i = 0; i < want; i++) {
+      let res;
+      try {
+        res = await getLocalJson(
+          this.base,
+          '/personal_fm',
+          { timestamp: Date.now() },
+          { cookie: this.cookie, timeoutMs: 12000 }
+        );
+      } catch (e) {
+        if (out.length) break; // 已经攒到一些就先用着
+        throw e;
+      }
+
+      // 限流：标记冷却并抛错，别静默返回空
+      if (res && res.code === 405) {
+        noteRateLimited();
+        throw new Error('网易云限流（code=405 操作频繁），已进入冷却');
+      }
+
+      const d = res && res.data;
+      const arr = Array.isArray(d) ? d : (d && Array.isArray(d.data) ? d.data : []);
+      const raw = arr[0];
+      if (!raw) {
+        if (out.length) break;
+        // 未登录 / 没有漫游权限
+        return [];
+      }
+      const song = this.mapSong(raw);
+      const key = String(song.songId || song.name);
+      if (seen[key]) continue;
+      seen[key] = 1;
+      out.push(song);
+    }
+
+    if (!out.length) return [];
+    logger.debug('网易云漫游取到 ' + out.length + ' 首');
+    return out;
   }
 
   /** 歌单曲目 */
